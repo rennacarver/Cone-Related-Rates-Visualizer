@@ -17,25 +17,49 @@ document.body.appendChild(renderer.domElement)
 
 camera.position.z = 5
 
-// Create cone
-const coneGeometry = new THREE.ConeGeometry(1, 2, 32)
-const coneMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 })
-const cone = new THREE.Mesh(coneGeometry, coneMaterial)
-cone.rotation.x = Math.PI
-scene.add(cone)
+// Create red cone
+const redConeGeometry = new THREE.ConeGeometry(1, 2, 32)
+const redConeMaterial = new THREE.MeshBasicMaterial({
+  color: 0xff0000,
+  transparent: true,
+  opacity: 0.5,
+})
+const redCone = new THREE.Mesh(redConeGeometry, redConeMaterial)
+redCone.rotation.x = Math.PI
+scene.add(redCone)
+
+// Create blue cone
+let blueConeScale = 0.5
+const blueConeGeometry = new THREE.ConeGeometry(1, 2, 32)
+const blueConeMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff })
+const blueCone = new THREE.Mesh(blueConeGeometry, blueConeMaterial)
+blueCone.rotation.x = Math.PI
+blueCone.scale.set(blueConeScale, blueConeScale, blueConeScale)
+scene.add(blueCone)
 
 // Create orbit controls
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.target.set(0, 0, 0) // Look at the origin
 
 // Control settings
-// controls.enableDamping = true
-// controls.enableRotate = true
+controls.enableDamping = true
+controls.enableRotate = true
+controls.enableZoom = true
+controls.enablePan = true
+
+// Animation variables
+let scaleDirection = 1
+const minScale = 0.01
+const maxScale = 1
+let currentScale = 0.5
 
 function animate() {
-  requestAnimationFrame(animate)
-  cone.rotation.y += 0.01
-  controls.update()
+  // Animate small cone scale
+  currentScale += scaleDirection * 0.001
+  if (currentScale > maxScale || currentScale < minScale) {
+    scaleDirection *= -1 // Change direction
+  }
+  blueCone.scale.set(currentScale, currentScale, currentScale)
   renderer.render(scene, camera)
 }
 

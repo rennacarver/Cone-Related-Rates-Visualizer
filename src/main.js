@@ -22,7 +22,7 @@ const cone = new THREE.Mesh(geometry, material)
 scene.add(cone)
 
 // Create a smaller smaller cone inside
-const smallGeometry = new THREE.ConeGeometry(0.9, 1.8, 32)
+const smallGeometry = new THREE.ConeGeometry(1, 2, 32)
 const smallMaterial = new THREE.MeshBasicMaterial({ color: 0x40e0d0 }) // turquoise
 const smallCone = new THREE.Mesh(smallGeometry, smallMaterial)
 scene.add(smallCone)
@@ -84,7 +84,7 @@ function onDocumentMouseUp() {
 // Animation variables
 let scaleDirection = 1
 const minScale = 0.01
-const maxScale = 0.9
+const maxScale = 1
 let currentScale = 0.5
 
 function animate() {

@@ -17,16 +17,22 @@ document.body.appendChild(renderer.domElement)
 
 //load water texture
 const textureLoader = new THREE.TextureLoader()
-const waterTexture = textureLoader.load('water.jpg')
+const waterTexture = textureLoader.load('water2.jpg')
+
+const video = document.createElement('video')
+video.loop = true
+video.muted = true
+video.src = 'water2.mp4'
+video.play()
 
 camera.position.z = 5
 
 // Create red cone
 const redConeGeometry = new THREE.ConeGeometry(1, 2, 32)
 const redConeMaterial = new THREE.MeshBasicMaterial({
-  color: 0xff0000,
+  color: 0x000000,
   transparent: true,
-  opacity: 0.5,
+  opacity: 0.05,
 })
 const redCone = new THREE.Mesh(redConeGeometry, redConeMaterial)
 redCone.rotation.x = Math.PI
@@ -39,8 +45,8 @@ const blueConeGeometry = new THREE.ConeGeometry(1, 2, 32)
 const blueConeMaterial = new THREE.MeshPhongMaterial({
   map: waterTexture, // Apply the water texture
   bumpMap: waterTexture, // Use the same texture for bump mapping
-  bumpScale: 0.1, // Adjust bump scale to control texture intensity
-  color: 0x0000ff, // Blue base color
+  bumpScale: 0.9, // Adjust bump scale to control texture intensity
+  color: 0xffffff, // Blue base color
   specular: 0xffffff, // Specular color
   shininess: 100, // Shininess
 })
@@ -49,13 +55,20 @@ blueCone.rotation.x = Math.PI
 blueCone.scale.set(blueConeScale, blueConeScale, blueConeScale)
 scene.add(blueCone)
 
+//create video texture
+const videoTexture = new THREE.VideoTexture(video)
+const videoMaterial = new THREE.MeshBasicMaterial({ map: videoTexture })
+
+// Replace the cone's material with the new one
+blueCone.material = videoMaterial
+
 // Add ambient light
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
+const ambientLight = new THREE.AmbientLight(0xffffff, 1.0)
 scene.add(ambientLight)
 
 // Add point light
-const pointLight = new THREE.PointLight(0xffffff, 1, 100)
-pointLight.position.set(5, 5, 5)
+const pointLight = new THREE.PointLight(0xffffff, 1, 10)
+pointLight.position.set(5, 10, 5)
 scene.add(pointLight)
 
 // Create orbit controls
@@ -71,12 +84,12 @@ controls.enablePan = true
 // Animation variables
 let scaleDirection = 1
 const minScale = 0.01
-const maxScale = 1
+const maxScale = 1.01
 let currentScale = 0.5
 
 function animate() {
   // Move the blue cone
-  blueCone.position.y = currentScale - 1
+  blueCone.position.y = currentScale - 1.005
   // Animate small cone scale
   currentScale += scaleDirection * 0.001
   if (currentScale > maxScale || currentScale < minScale) {

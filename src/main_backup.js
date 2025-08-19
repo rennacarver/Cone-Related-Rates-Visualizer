@@ -1,6 +1,9 @@
 import * as THREE from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
+// Scene setup
 const scene = new THREE.Scene()
+scene.background = new THREE.Color(0xffffff)
 const camera = new THREE.PerspectiveCamera(
   75,
   window.innerWidth / window.innerHeight,
@@ -12,74 +15,58 @@ const renderer = new THREE.WebGLRenderer()
 renderer.setSize(window.innerWidth, window.innerHeight)
 document.body.appendChild(renderer.domElement)
 
-const geometry = new THREE.ConeGeometry(1, 2, 32)
-const material = new THREE.MeshBasicMaterial({
-  color: 0xffffff, // Green color
-  transparent: true, // Enable transparency
-  opacity: 0.5, // 50% opacity (0 = fully transparent, 1 = fully opaque)
-})
-const cone = new THREE.Mesh(geometry, material)
-scene.add(cone)
-
-// Create a smaller smaller cone inside
-const smallGeometry = new THREE.ConeGeometry(1, 2, 32)
-const smallMaterial = new THREE.MeshBasicMaterial({ color: 0x40e0d0 }) // turquoise
-const smallCone = new THREE.Mesh(smallGeometry, smallMaterial)
-scene.add(smallCone)
-
-// Flip the larger cone vertically
-cone.rotation.x = Math.PI // 180 degrees around x-axis
-smallCone.rotation.x = Math.PI // 180 degrees around x-axis
+//load water texture
+const textureLoader = new THREE.TextureLoader()
+const waterTexture = textureLoader.load('water.jpg')
 
 camera.position.z = 5
 
-// Variables to store rotation
-let isDragging = false
-let previousMousePosition = {
-  x: 0,
-  y: 0,
-}
+// Create red cone
+const redConeGeometry = new THREE.ConeGeometry(1, 2, 32)
+const redConeMaterial = new THREE.MeshBasicMaterial({
+  color: 0xff0000,
+  transparent: true,
+  opacity: 0.5,
+})
+const redCone = new THREE.Mesh(redConeGeometry, redConeMaterial)
+redCone.rotation.x = Math.PI
+scene.add(redCone)
 
-// Add event listeners
-document.addEventListener('mousedown', onDocumentMouseDown)
-document.addEventListener('mousemove', onDocumentMouseMove)
-document.addEventListener('mouseup', onDocumentMouseUp)
+// Create blue cone
+let blueConeScale = 0.5
+const blueConeGeometry = new THREE.ConeGeometry(1, 2, 32)
+// Create a material for the cone with water texture
+const blueConeMaterial = new THREE.MeshPhongMaterial({
+  map: waterTexture, // Apply the water texture
+  bumpMap: waterTexture, // Use the same texture for bump mapping
+  bumpScale: 0.1, // Adjust bump scale to control texture intensity
+  color: 0x0000ff, // Blue base color
+  specular: 0xffffff, // Specular color
+  shininess: 100, // Shininess
+})
+const blueCone = new THREE.Mesh(blueConeGeometry, blueConeMaterial)
+blueCone.rotation.x = Math.PI
+blueCone.scale.set(blueConeScale, blueConeScale, blueConeScale)
+scene.add(blueCone)
 
-// Event handler for mouse click down
-function onDocumentMouseDown(event) {
-  event.preventDefault()
-  isDragging = true
-  previousMousePosition = {
-    x: event.clientX,
-    y: event.clientY,
-  }
-}
+// Add ambient light
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
+scene.add(ambientLight)
 
-// Event handler for mouse move
-function onDocumentMouseMove(event) {
-  if (isDragging) {
-    const deltaMousePosition = {
-      x: event.clientX - previousMousePosition.x,
-      y: event.clientY - previousMousePosition.y,
-    }
+// Add point light
+const pointLight = new THREE.PointLight(0xffffff, 1, 100)
+pointLight.position.set(5, 5, 5)
+scene.add(pointLight)
 
-    // Update rotation
-    cone.rotation.z += deltaMousePosition.y * 0.01
-    cone.rotation.y += deltaMousePosition.x * 0.01
-    smallCone.rotation.z += deltaMousePosition.y * 0.01
-    smallCone.rotation.y += deltaMousePosition.x * 0.01
+// Create orbit controls
+const controls = new OrbitControls(camera, renderer.domElement)
+controls.target.set(0, 0, 0) // Look at the origin
 
-    previousMousePosition = {
-      x: event.clientX,
-      y: event.clientY,
-    }
-  }
-}
-
-// Event handler for mouse up
-function onDocumentMouseUp() {
-  isDragging = false
-}
+// Control settings
+controls.enableDamping = true
+controls.enableRotate = true
+controls.enableZoom = true
+controls.enablePan = true
 
 // Animation variables
 let scaleDirection = 1
@@ -88,12 +75,15 @@ const maxScale = 1
 let currentScale = 0.5
 
 function animate() {
+  // Move the blue cone
+  blueCone.position.y = currentScale - 1
   // Animate small cone scale
   currentScale += scaleDirection * 0.001
   if (currentScale > maxScale || currentScale < minScale) {
     scaleDirection *= -1 // Change direction
   }
-  smallCone.scale.set(currentScale, currentScale, currentScale)
+  blueCone.scale.set(currentScale, currentScale, currentScale)
   renderer.render(scene, camera)
 }
+
 renderer.setAnimationLoop(animate)

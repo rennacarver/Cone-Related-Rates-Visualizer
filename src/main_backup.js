@@ -28,8 +28,13 @@ video.play()
 
 camera.position.z = 5
 
+// Create cone variables
+let coneHeight = parseFloat(document.getElementById('heightInput').value)
+let coneRadius = parseFloat(document.getElementById('radiusInput').value)
+
 // Create red cone
-const redConeGeometry = new THREE.ConeGeometry(1, 2, 32)
+
+const redConeGeometry = new THREE.ConeGeometry(coneRadius, coneHeight, 32)
 const redConeMaterial = new THREE.MeshBasicMaterial({
   color: 0x000000,
   transparent: true,
@@ -41,7 +46,7 @@ scene.add(redCone)
 
 // Create blue cone
 let blueConeScale = 0.5
-const blueConeGeometry = new THREE.ConeGeometry(1, 2, 32)
+const blueConeGeometry = new THREE.ConeGeometry(coneRadius, coneHeight, 32)
 // Create a material for the cone with water texture
 const blueConeMaterial = new THREE.MeshPhongMaterial({
   map: waterTexture, // Apply the water texture
@@ -62,6 +67,26 @@ const videoMaterial = new THREE.MeshBasicMaterial({ map: videoTexture })
 
 // Replace the cone's material with the new one
 blueCone.material = videoMaterial
+
+// Update cone height when number input changes
+const heightInput = document.getElementById('heightInput')
+heightInput.addEventListener('input', (e) => {
+  coneHeight = parseFloat(e.target.value)
+  blueCone.geometry.dispose() // dispose old geometry
+  redCone.geometry.dispose() // dispose old geometry
+  blueCone.geometry = new THREE.ConeGeometry(1, coneHeight, 32)
+  redCone.geometry = new THREE.ConeGeometry(1, coneHeight, 32)
+})
+
+// Update cone height when number input changes
+const radiusInput = document.getElementById('radiusInput')
+radiusInput.addEventListener('input', (e) => {
+  coneRadius = parseFloat(e.target.value)
+  blueCone.geometry.dispose() // dispose old geometry
+  redCone.geometry.dispose() // dispose old geometry
+  blueCone.geometry = new THREE.ConeGeometry(coneRadius, coneHeight, 32)
+  redCone.geometry = new THREE.ConeGeometry(coneRadius, coneHeight, 32)
+})
 
 // Add ambient light
 const ambientLight = new THREE.AmbientLight(0xffffff, 1.0)
@@ -89,8 +114,8 @@ const maxScale = 1.01
 let currentScale = 0.5
 
 function animate() {
-  // Move the blue cone
-  blueCone.position.y = currentScale - 1.005
+  // Align the tip of the blue cone with the red cone
+  blueCone.position.y = (-coneHeight / 2) * currentScale + coneHeight / 2
   // Animate small cone scale
   currentScale += scaleDirection * 0.001
   if (currentScale > maxScale || currentScale < minScale) {
@@ -99,5 +124,12 @@ function animate() {
   blueCone.scale.set(currentScale, currentScale, currentScale)
   renderer.render(scene, camera)
 }
+
+// Handle window resize
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight
+  camera.updateProjectionMatrix()
+  renderer.setSize(window.innerWidth, window.innerHeight)
+})
 
 renderer.setAnimationLoop(animate)

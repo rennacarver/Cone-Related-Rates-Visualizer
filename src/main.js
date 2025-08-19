@@ -15,6 +15,10 @@ const renderer = new THREE.WebGLRenderer()
 renderer.setSize(window.innerWidth, window.innerHeight)
 document.body.appendChild(renderer.domElement)
 
+//load water texture
+const textureLoader = new THREE.TextureLoader()
+const waterTexture = textureLoader.load('water.jpg')
+
 camera.position.z = 5
 
 // Create red cone
@@ -31,11 +35,28 @@ scene.add(redCone)
 // Create blue cone
 let blueConeScale = 0.5
 const blueConeGeometry = new THREE.ConeGeometry(1, 2, 32)
-const blueConeMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff })
+// Create a material for the cone with water texture
+const blueConeMaterial = new THREE.MeshPhongMaterial({
+  map: waterTexture, // Apply the water texture
+  bumpMap: waterTexture, // Use the same texture for bump mapping
+  bumpScale: 0.1, // Adjust bump scale to control texture intensity
+  color: 0x0000ff, // Blue base color
+  specular: 0xffffff, // Specular color
+  shininess: 100, // Shininess
+})
 const blueCone = new THREE.Mesh(blueConeGeometry, blueConeMaterial)
 blueCone.rotation.x = Math.PI
 blueCone.scale.set(blueConeScale, blueConeScale, blueConeScale)
 scene.add(blueCone)
+
+// Add ambient light
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
+scene.add(ambientLight)
+
+// Add point light
+const pointLight = new THREE.PointLight(0xffffff, 1, 100)
+pointLight.position.set(5, 5, 5)
+scene.add(pointLight)
 
 // Create orbit controls
 const controls = new OrbitControls(camera, renderer.domElement)
@@ -54,6 +75,8 @@ const maxScale = 1
 let currentScale = 0.5
 
 function animate() {
+  // Move the blue cone
+  blueCone.position.y = currentScale - 1
   // Animate small cone scale
   currentScale += scaleDirection * 0.001
   if (currentScale > maxScale || currentScale < minScale) {

@@ -33,7 +33,7 @@ let coneHeight = parseFloat(document.getElementById('heightInput').value)
 let coneRadius = parseFloat(document.getElementById('radiusInput').value)
 
 // Create container (red) cone
-const containerGeometry = new THREE.ConeGeometry(coneRadius, coneHeight, 32)
+const containerGeometry = new THREE.ConeGeometry(coneRadius, coneHeight, 64)
 const containerMaterial = new THREE.MeshBasicMaterial({
   color: 0x000000,
   transparent: true,
@@ -45,11 +45,14 @@ containerCone.position.y = coneHeight / 2
 scene.add(containerCone)
 
 // Create water (blue) cone
-const waterGeometry = new THREE.ConeGeometry(coneRadius, coneHeight, 32)
+const waterGeometry = new THREE.ConeGeometry(coneRadius, coneHeight, 64)
 const waterMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff }) // placeholder
 const waterCone = new THREE.Mesh(waterGeometry, waterMaterial)
 waterCone.rotation.x = Math.PI
 scene.add(waterCone)
+
+// tiny offset toward the camera (prevents z-fighting)
+waterCone.position.z = 0.001
 
 // Apply video texture to water cone
 const videoTexture = new THREE.VideoTexture(video)

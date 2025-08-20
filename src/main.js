@@ -31,9 +31,14 @@ video.play()
 // Initial cone parameters
 let coneHeight = parseFloat(document.getElementById('heightInput').value)
 let coneRadius = parseFloat(document.getElementById('radiusInput').value)
+let coneSegments = 64
 
 // Create container (red) cone
-const containerGeometry = new THREE.ConeGeometry(coneRadius, coneHeight, 64)
+const containerGeometry = new THREE.ConeGeometry(
+  coneRadius,
+  coneHeight,
+  coneSegments
+)
 const containerMaterial = new THREE.MeshBasicMaterial({
   color: 0x000000,
   transparent: true,
@@ -45,7 +50,11 @@ containerCone.position.y = coneHeight / 2
 scene.add(containerCone)
 
 // Create water (blue) cone
-const waterGeometry = new THREE.ConeGeometry(coneRadius, coneHeight, 64)
+const waterGeometry = new THREE.ConeGeometry(
+  coneRadius,
+  coneHeight,
+  coneSegments
+)
 const waterMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff }) // placeholder
 const waterCone = new THREE.Mesh(waterGeometry, waterMaterial)
 waterCone.rotation.x = Math.PI
@@ -60,21 +69,6 @@ waterCone.material = new THREE.MeshBasicMaterial({ map: videoTexture })
 waterCone.scale.set(0.01, 0.01, 0.01)
 waterCone.position.y = (coneHeight * waterCone.scale.y) / 2
 
-// Material for the outline
-const outlineMaterial = new THREE.LineBasicMaterial({
-  color: 0x000000,
-  linewidth: 0.1,
-})
-
-// Create outline geometry
-const outlineGeometry = new THREE.EdgesGeometry(containerGeometry)
-const outline = new THREE.LineSegments(outlineGeometry, outlineMaterial)
-outline.rotation.x = Math.PI
-outline.position.y = coneHeight / 2
-
-// Add cone and outline to the scene
-scene.add(outline)
-
 // Orbit controls
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.target.set(0, 0, 0)
@@ -88,17 +82,21 @@ function updateCones() {
   // Dispose old geometries
   containerCone.geometry.dispose()
   waterCone.geometry.dispose()
-  outline.geometry.dispose()
 
   // Create new geometries
-  containerCone.geometry = new THREE.ConeGeometry(coneRadius, coneHeight, 32)
-  waterCone.geometry = new THREE.ConeGeometry(coneRadius, coneHeight, 32)
-  let outlineGeometry = new THREE.EdgesGeometry(containerCone.geometry)
-  outline = new THREE.LineSegments(outlineGeometry, outlineMaterial)
+  containerCone.geometry = new THREE.ConeGeometry(
+    coneRadius,
+    coneHeight,
+    coneSegments
+  )
+  waterCone.geometry = new THREE.ConeGeometry(
+    coneRadius,
+    coneHeight,
+    coneSegments
+  )
 
   // Align bases
   containerCone.position.y = coneHeight / 2
-  outline.position.y = coneHeight / 2
   waterCone.position.y = (coneHeight * waterCone.scale.y) / 2
 }
 

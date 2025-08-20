@@ -17,10 +17,7 @@ const renderer = new THREE.WebGLRenderer()
 renderer.setSize(window.innerWidth, window.innerHeight)
 document.body.appendChild(renderer.domElement)
 
-// Load water texture and video
-const textureLoader = new THREE.TextureLoader()
-const waterTexture = textureLoader.load('water2.jpg')
-
+// Load water video
 const video = document.createElement('video')
 video.loop = true
 video.muted = true
@@ -31,9 +28,10 @@ video.play()
 // Initial cone parameters
 let coneHeight = parseFloat(document.getElementById('heightInput').value)
 let coneRadius = parseFloat(document.getElementById('radiusInput').value)
-let coneSegments = 64
+let coneSegments = 32
+let thresholdAngle = 30
 
-// Create container (red) cone
+// ---------------- Container Cone (static) ----------------
 const containerGeometry = new THREE.ConeGeometry(
   coneRadius,
   coneHeight,
@@ -46,30 +44,56 @@ const containerMaterial = new THREE.MeshBasicMaterial({
 })
 const containerCone = new THREE.Mesh(containerGeometry, containerMaterial)
 containerCone.rotation.x = Math.PI
-containerCone.position.y = coneHeight / 2
-scene.add(containerCone)
 
-// Create water (blue) cone
+// Black silhouette edges for container cone
+const containerEdgeGeometry = new THREE.EdgesGeometry(
+  containerGeometry,
+  thresholdAngle
+)
+const containerEdgeLines = new THREE.LineSegments(
+  containerEdgeGeometry,
+  new THREE.LineBasicMaterial({ color: 0x000000 })
+)
+containerEdgeLines.rotation.x = Math.PI
+
+// Group container cone + edges
+const containerGroup = new THREE.Group()
+containerGroup.add(containerCone)
+containerGroup.add(containerEdgeLines)
+containerGroup.position.y = coneHeight / 2
+scene.add(containerGroup)
+
+// ---------------- Water Cone (animated) ----------------
 const waterGeometry = new THREE.ConeGeometry(
   coneRadius,
   coneHeight,
   coneSegments
 )
-const waterMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff }) // placeholder
+const videoTexture = new THREE.VideoTexture(video)
+const waterMaterial = new THREE.MeshBasicMaterial({ map: videoTexture })
 const waterCone = new THREE.Mesh(waterGeometry, waterMaterial)
 waterCone.rotation.x = Math.PI
-scene.add(waterCone)
+waterCone.position.z = 0.001 // tiny offset to prevent z-fighting
 
-// tiny offset toward the camera (prevents z-fighting)
-waterCone.position.z = 0.001
+// White silhouette edges for water cone
+const edgeGeometry = new THREE.EdgesGeometry(waterGeometry, thresholdAngle)
+const edgeLines = new THREE.LineSegments(
+  edgeGeometry,
+  new THREE.LineBasicMaterial({ color: 0xffffff })
+)
+edgeLines.rotation.x = Math.PI
 
-// Apply video texture to water cone
-const videoTexture = new THREE.VideoTexture(video)
-waterCone.material = new THREE.MeshBasicMaterial({ map: videoTexture })
-waterCone.scale.set(0.01, 0.01, 0.01)
-waterCone.position.y = (coneHeight * waterCone.scale.y) / 2
+// Group water cone + edges for scaling
+const waterGroup = new THREE.Group()
+waterGroup.add(waterCone)
+waterGroup.add(edgeLines)
+scene.add(waterGroup)
 
-// Orbit controls
+// Initial scale & alignment
+waterGroup.scale.set(0.01, 0.01, 0.01)
+waterGroup.position.y = (coneHeight * waterGroup.scale.y) / 2
+
+// ---------------- Orbit Controls ----------------
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.target.set(0, 0, 0)
 controls.enableDamping = true
@@ -77,30 +101,40 @@ controls.enableRotate = true
 controls.enableZoom = true
 controls.enablePan = true
 
-// Function to update cone geometries and positions
+// ---------------- Update Cones Function ----------------
 function updateCones() {
   // Dispose old geometries
   containerCone.geometry.dispose()
+  containerEdgeLines.geometry.dispose()
   waterCone.geometry.dispose()
+  edgeLines.geometry.dispose()
 
-  // Create new geometries
+  // New geometries
   containerCone.geometry = new THREE.ConeGeometry(
     coneRadius,
     coneHeight,
     coneSegments
   )
+  containerEdgeLines.geometry = new THREE.EdgesGeometry(
+    containerCone.geometry,
+    45
+  )
+  containerEdgeLines.rotation.x = Math.PI
+
   waterCone.geometry = new THREE.ConeGeometry(
     coneRadius,
     coneHeight,
     coneSegments
   )
+  edgeLines.geometry = new THREE.EdgesGeometry(waterCone.geometry, 45)
+  edgeLines.rotation.x = Math.PI
 
-  // Align bases
-  containerCone.position.y = coneHeight / 2
-  waterCone.position.y = (coneHeight * waterCone.scale.y) / 2
+  // Align positions
+  containerGroup.position.y = coneHeight / 2
+  waterGroup.position.y = (coneHeight * waterGroup.scale.y) / 2
 }
 
-// Input event listeners
+// ---------------- Input Listeners ----------------
 document.getElementById('heightInput').addEventListener('input', (e) => {
   coneHeight = parseFloat(e.target.value)
   updateCones()
@@ -111,7 +145,7 @@ document.getElementById('radiusInput').addEventListener('input', (e) => {
   updateCones()
 })
 
-// Animation
+// ---------------- Animation ----------------
 let scaleDirection = 1
 const minScale = 0.01
 const maxScale = 1.01
@@ -120,20 +154,21 @@ let currentScale = 0.01
 function animate() {
   requestAnimationFrame(animate)
 
-  // Animate water cone scaling
+  // Animate scaling of waterGroup (cone + edges)
   currentScale += scaleDirection * 0.001
   if (currentScale > maxScale || currentScale < minScale) scaleDirection *= -1
-  waterCone.scale.set(currentScale, currentScale, currentScale)
+  waterGroup.scale.set(currentScale, currentScale, currentScale)
 
-  // Adjust position to keep base aligned
-  waterCone.position.y = (coneHeight * currentScale) / 2
+  // Keep base aligned
+  waterGroup.position.y = (coneHeight * currentScale) / 2
 
+  controls.update()
   renderer.render(scene, camera)
 }
 
 animate()
 
-// Window resize
+// ---------------- Handle Window Resize ----------------
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight
   camera.updateProjectionMatrix()

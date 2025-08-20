@@ -60,6 +60,21 @@ waterCone.material = new THREE.MeshBasicMaterial({ map: videoTexture })
 waterCone.scale.set(0.01, 0.01, 0.01)
 waterCone.position.y = (coneHeight * waterCone.scale.y) / 2
 
+// Material for the outline
+const outlineMaterial = new THREE.LineBasicMaterial({
+  color: 0x000000,
+  linewidth: 0.1,
+})
+
+// Create outline geometry
+const outlineGeometry = new THREE.EdgesGeometry(containerGeometry)
+const outline = new THREE.LineSegments(outlineGeometry, outlineMaterial)
+outline.rotation.x = Math.PI
+outline.position.y = coneHeight / 2
+
+// Add cone and outline to the scene
+scene.add(outline)
+
 // Orbit controls
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.target.set(0, 0, 0)
@@ -73,13 +88,17 @@ function updateCones() {
   // Dispose old geometries
   containerCone.geometry.dispose()
   waterCone.geometry.dispose()
+  outline.geometry.dispose()
 
   // Create new geometries
   containerCone.geometry = new THREE.ConeGeometry(coneRadius, coneHeight, 32)
   waterCone.geometry = new THREE.ConeGeometry(coneRadius, coneHeight, 32)
+  let outlineGeometry = new THREE.EdgesGeometry(containerCone.geometry)
+  outline = new THREE.LineSegments(outlineGeometry, outlineMaterial)
 
   // Align bases
   containerCone.position.y = coneHeight / 2
+  outline.position.y = coneHeight / 2
   waterCone.position.y = (coneHeight * waterCone.scale.y) / 2
 }
 

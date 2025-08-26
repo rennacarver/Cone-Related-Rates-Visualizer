@@ -70,8 +70,8 @@ const waterGeometry = new THREE.ConeGeometry(
   coneSegments
 )
 const videoTexture = new THREE.VideoTexture(video)
-//const waterMaterial = new THREE.MeshBasicMaterial({ map: videoTexture })
-const waterMaterial = new THREE.MeshToonMaterial({ color: 0x87ceeb }) // Sky blue
+const waterMaterial = new THREE.MeshBasicMaterial({ map: videoTexture })
+//const waterMaterial = new THREE.MeshToonMaterial({ color: 0x87ceeb }) // Sky blue
 const waterCone = new THREE.Mesh(waterGeometry, waterMaterial)
 waterCone.rotation.x = Math.PI
 waterCone.position.z = 0.001 // tiny offset to prevent z-fighting
@@ -159,7 +159,14 @@ document.getElementById('radiusInput').addEventListener('input', (e) => {
   updateCones()
 })
 
+const playPauseButton = document.getElementById('play-pause-button')
+playPauseButton.addEventListener('click', () => {
+  isPlaying = !isPlaying
+  playPauseButton.textContent = isPlaying ? 'Pause' : 'Play'
+})
+
 // ---------------- Animation ----------------
+let isPlaying = true
 let scaleDirection = 1
 const minScale = 0.01
 const maxScale = 1.01
@@ -168,13 +175,15 @@ let currentScale = 0.01
 function animate() {
   requestAnimationFrame(animate)
 
-  // Animate scaling of waterGroup (cone + edges)
-  currentScale += scaleDirection * 0.001
-  if (currentScale > maxScale || currentScale < minScale) scaleDirection *= -1
-  waterGroup.scale.set(currentScale, currentScale, currentScale)
+  if (isPlaying) {
+    // Animate scaling of waterGroup (cone + edges)
+    currentScale += scaleDirection * 0.001
+    if (currentScale > maxScale || currentScale < minScale) scaleDirection *= -1
+    waterGroup.scale.set(currentScale, currentScale, currentScale)
 
-  // Keep base aligned
-  waterGroup.position.y = (coneHeight * currentScale) / 2
+    // Keep base aligned
+    waterGroup.position.y = (coneHeight * currentScale) / 2
+  }
 
   controls.update()
   renderer.render(scene, camera)

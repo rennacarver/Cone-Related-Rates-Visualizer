@@ -12,6 +12,7 @@ const camera = new THREE.PerspectiveCamera(
   1000
 )
 camera.position.z = 5
+camera.position.y = 3
 
 const renderer = new THREE.WebGLRenderer()
 renderer.setSize(window.innerWidth, window.innerHeight)
@@ -165,12 +166,20 @@ playPauseButton.addEventListener('click', () => {
   playPauseButton.textContent = isPlaying ? 'Pause' : 'Play'
 })
 
+const animationSlider = document.getElementById('animation-slider')
+
+animationSlider.addEventListener('click', () => {
+  isPlaying = false
+  playPauseButton.textContent = isPlaying ? 'Pause' : 'Play'
+})
+
 // ---------------- Animation ----------------
 let isPlaying = true
 let scaleDirection = 1
 const minScale = 0.01
 const maxScale = 1.01
 let currentScale = 0.01
+let currentFrame = 0
 
 function animate() {
   requestAnimationFrame(animate)
@@ -178,11 +187,23 @@ function animate() {
   if (isPlaying) {
     // Animate scaling of waterGroup (cone + edges)
     currentScale += scaleDirection * 0.001
+    animationSlider.value = currentScale * 1000
     if (currentScale > maxScale || currentScale < minScale) scaleDirection *= -1
     waterGroup.scale.set(currentScale, currentScale, currentScale)
 
     // Keep base aligned
     waterGroup.position.y = (coneHeight * currentScale) / 2
+  }
+
+  if (!isPlaying) {
+    // Update current frame based on slider value
+    currentFrame = animationSlider.value / 1000
+
+    // Animate scaling of waterGroup (cone + edges)
+    waterGroup.scale.set(currentFrame, currentFrame, currentFrame)
+
+    // Keep base aligned
+    waterGroup.position.y = (coneHeight * waterGroup.scale.y) / 2
   }
 
   controls.update()

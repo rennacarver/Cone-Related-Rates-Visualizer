@@ -38,7 +38,7 @@ const containerGeometry = new THREE.ConeGeometry(
   coneSegments
 )
 const containerMaterial = new THREE.MeshBasicMaterial({
-  color: 0x000000,
+  color: 0x87ceeb,
   transparent: true,
   opacity: 0.1,
 })
@@ -70,7 +70,8 @@ const waterGeometry = new THREE.ConeGeometry(
   coneSegments
 )
 const videoTexture = new THREE.VideoTexture(video)
-const waterMaterial = new THREE.MeshBasicMaterial({ map: videoTexture })
+//const waterMaterial = new THREE.MeshBasicMaterial({ map: videoTexture })
+const waterMaterial = new THREE.MeshToonMaterial({ color: 0x87ceeb }) // Sky blue
 const waterCone = new THREE.Mesh(waterGeometry, waterMaterial)
 waterCone.rotation.x = Math.PI
 waterCone.position.z = 0.001 // tiny offset to prevent z-fighting
@@ -92,6 +93,19 @@ scene.add(waterGroup)
 // Initial scale & alignment
 waterGroup.scale.set(0.01, 0.01, 0.01)
 waterGroup.position.y = (coneHeight * waterGroup.scale.y) / 2
+
+// Add lighting
+const ambientLight = new THREE.AmbientLight(0xffffff, 1) // soft white light
+scene.add(ambientLight)
+
+const pointLight = new THREE.PointLight(0xffffff, 1, 10) // white light
+pointLight.position.set(2, 2, 2)
+scene.add(pointLight)
+
+// Add a directional light for more dramatic effect
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
+directionalLight.position.set(-2, 2, 2)
+scene.add(directionalLight)
 
 // ---------------- Orbit Controls ----------------
 const controls = new OrbitControls(camera, renderer.domElement)

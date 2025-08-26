@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import Desmos from 'desmos'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 // Scene setup
@@ -248,3 +249,17 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix()
   renderer.setSize(window.innerWidth, window.innerHeight)
 })
+
+//Desmos setup
+const elt = document.createElement('div')
+elt.style.width = `${window.innerWidth}`
+elt.style.height = '400px'
+
+const calculator = Desmos.GraphingCalculator(elt, {
+  keypad: false,
+  expressions: false,
+  settingsMenu: false,
+})
+calculator.setExpression({ id: 'graph1', latex: 'y=x^2' })
+
+document.body.append(elt)

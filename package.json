@@ -12,6 +12,7 @@
     "vite": "^7.1.2"
   },
   "dependencies": {
+    "desmos": "^1.5.4",
     "three": "^0.179.1"
   }
 }

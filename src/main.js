@@ -149,15 +149,38 @@ function updateCones() {
   waterGroup.position.y = (coneHeight * waterGroup.scale.y) / 2
 }
 
+// ---------------- Dimension Display --------------
+const volumeDisplay = document.getElementById('volume-display')
+const radiusDisplay = document.getElementById('radius-display')
+const heightDisplay = document.getElementById('height-display')
+
+function updateDisplays() {
+  const volume =
+    (1 / 3) *
+    Math.PI *
+    coneRadius *
+    coneRadius *
+    coneHeight *
+    currentScale *
+    currentScale *
+    currentScale
+  volumeDisplay.textContent = volume.toFixed(2)
+
+  radiusDisplay.textContent = (coneRadius * currentScale).toFixed(2)
+  heightDisplay.textContent = (coneHeight * currentScale).toFixed(2)
+}
+
 // ---------------- Input Listeners ----------------
 document.getElementById('heightInput').addEventListener('input', (e) => {
   coneHeight = parseFloat(e.target.value)
   updateCones()
+  updateDisplays()
 })
 
 document.getElementById('radiusInput').addEventListener('input', (e) => {
   coneRadius = parseFloat(e.target.value)
   updateCones()
+  updateDisplays()
 })
 
 const playPauseButton = document.getElementById('play-pause-button')
@@ -193,17 +216,24 @@ function animate() {
 
     // Keep base aligned
     waterGroup.position.y = (coneHeight * currentScale) / 2
+
+    //update Display
+    updateDisplays()
   }
 
   if (!isPlaying) {
     // Update current frame based on slider value
     currentFrame = animationSlider.value / 1000
+    currentScale = currentFrame
 
     // Animate scaling of waterGroup (cone + edges)
     waterGroup.scale.set(currentFrame, currentFrame, currentFrame)
 
     // Keep base aligned
     waterGroup.position.y = (coneHeight * waterGroup.scale.y) / 2
+
+    //update Display
+    updateDisplays()
   }
 
   controls.update()

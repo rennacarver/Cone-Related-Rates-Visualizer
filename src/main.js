@@ -120,16 +120,6 @@ controls.enablePan = true
 // ---------------- Update Desmos Function ----------------
 function updateDesmos() {
   calculator.setBlank()
-  calculator.setExpression({
-    id: 'graph1',
-    latex: '(t, \\cos t)',
-    playing: true,
-    parametricDomain: { min: '0', max: 'a' },
-  })
-  calculator.setExpression({
-    id: 'a',
-    latex: `a=${currentScale}`,
-  })
 }
 
 // ---------------- Update Cones Function ----------------
@@ -210,6 +200,7 @@ const animationSlider = document.getElementById('animation-slider')
 animationSlider.addEventListener('click', () => {
   isPlaying = false
   playPauseButton.textContent = isPlaying ? 'Pause' : 'Play'
+  updateDesmos()
 })
 
 // ---------------- Animation ----------------
@@ -257,9 +248,6 @@ function animate() {
 
     //update Display
     updateDisplays()
-
-    //update Desmos
-    //updateDesmos()
   }
 
   if (!isPlaying) {
@@ -275,9 +263,6 @@ function animate() {
 
     //update Display
     updateDisplays()
-
-    //update Desmos
-    updateDesmos()
   }
 
   controls.update()

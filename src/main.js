@@ -13,13 +13,25 @@ const calculator = Desmos.GraphingCalculator(elt, {
   settingsMenu: false,
 })
 calculator.setExpression({
-  id: 'graph1',
-  latex: '(t, \\cos t)',
+  id: 'Volume',
+  latex: '(t, \\frac{1}{3}\\pi (t\\cdot r)^2(t \\cdot h))',
   parametricDomain: { min: '0', max: 'a' },
+  color: Desmos.Colors.PURPLE,
+  label: 'Volume',
 })
 calculator.setExpression({
-  id: 'a',
-  latex: `a=${3}`,
+  id: 'Radius',
+  latex: '(t, t\\cdot r)',
+  parametricDomain: { min: '0', max: 'a' },
+  color: Desmos.Colors.BLUE,
+  label: 'Radius',
+})
+calculator.setExpression({
+  id: 'Height',
+  latex: '(t, t\\cdot h)',
+  parametricDomain: { min: '0', max: 'a' },
+  color: Desmos.Colors.RED,
+  label: 'Height',
 })
 
 document.body.append(elt)
@@ -142,9 +154,20 @@ controls.enablePan = true
 // ---------------- Update Desmos Function ----------------
 function updateDesmos() {
   calculator.removeExpression({ id: 'a' })
+  calculator.removeExpression({ id: 'r' })
+  calculator.removeExpression({ id: 'h' })
   calculator.setExpression({
     id: 'a',
     latex: `a=${currentScale.toFixed(2)}`,
+  })
+  calculator.setExpression({
+    id: 'r',
+    latex: `r=${(currentScale * coneRadius).toFixed(2)}`,
+    hidden: true,
+  })
+  calculator.setExpression({
+    id: 'h',
+    latex: `h=${(currentScale * coneHeight).toFixed(2)}`,
   })
 }
 
@@ -181,13 +204,9 @@ function updateCones() {
   waterGroup.position.y = (coneHeight * waterGroup.scale.y) / 2
 }
 
-// ---------------- Dimension Display --------------
-const volumeDisplay = document.getElementById('volume-display')
-const radiusDisplay = document.getElementById('radius-display')
-const heightDisplay = document.getElementById('height-display')
-
-function updateDisplays() {
-  const volume =
+// ---------------- Math Formulas --------------
+function calculateVolume() {
+  return (
     (1 / 3) *
     Math.PI *
     coneRadius *
@@ -196,10 +215,28 @@ function updateDisplays() {
     currentScale *
     currentScale *
     currentScale
+  )
+}
+
+function calculateRadius() {
+  return coneRadius * currentScale
+}
+
+function calculateHeight() {
+  return coneHeight * currentScale
+}
+
+// ---------------- Dimension Display --------------
+const volumeDisplay = document.getElementById('volume-display')
+const radiusDisplay = document.getElementById('radius-display')
+const heightDisplay = document.getElementById('height-display')
+
+function updateDisplays() {
+  const volume = calculateVolume()
   volumeDisplay.textContent = volume.toFixed(2)
 
-  radiusDisplay.textContent = (coneRadius * currentScale).toFixed(2)
-  heightDisplay.textContent = (coneHeight * currentScale).toFixed(2)
+  radiusDisplay.textContent = calculateRadius().toFixed(2)
+  heightDisplay.textContent = calculateHeight().toFixed(2)
 }
 
 // ---------------- Input Listeners ----------------

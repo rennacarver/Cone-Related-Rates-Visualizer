@@ -220,7 +220,6 @@ const calculator = Desmos.GraphingCalculator(elt, {
   keypad: false,
   expressionsCollapsed: false,
   settingsMenu: false,
-  playing: true,
 })
 calculator.setExpression({
   id: 'graph1',

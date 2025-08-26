@@ -119,8 +119,17 @@ controls.enablePan = true
 
 // ---------------- Update Desmos Function ----------------
 function updateDesmos() {
-  //calculator.removeExpression({ id: 'a' })
-  //calculator.setExpression({ id: 'a', latex: `a=${currentScale}` })
+  calculator.setBlank()
+  calculator.setExpression({
+    id: 'graph1',
+    latex: '(t, \\cos t)',
+    playing: true,
+    parametricDomain: { min: '0', max: 'a' },
+  })
+  calculator.setExpression({
+    id: 'a',
+    latex: `a=${currentScale}`,
+  })
 }
 
 // ---------------- Update Cones Function ----------------
@@ -220,12 +229,10 @@ const calculator = Desmos.GraphingCalculator(elt, {
   keypad: false,
   expressionsCollapsed: false,
   settingsMenu: false,
-  playing: true,
 })
 calculator.setExpression({
   id: 'graph1',
   latex: '(t, \\cos t)',
-  playing: true,
   parametricDomain: { min: '0', max: 'a' },
 })
 calculator.setExpression({
@@ -252,7 +259,7 @@ function animate() {
     updateDisplays()
 
     //update Desmos
-    updateDesmos()
+    //updateDesmos()
   }
 
   if (!isPlaying) {

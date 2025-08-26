@@ -2,6 +2,28 @@ import * as THREE from 'three'
 import Desmos from 'desmos'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
+//Desmos setup
+const elt = document.createElement('div')
+elt.style.width = `${window.innerWidth}`
+elt.style.height = '400px'
+
+const calculator = Desmos.GraphingCalculator(elt, {
+  keypad: false,
+  expressionsCollapsed: false,
+  settingsMenu: false,
+})
+calculator.setExpression({
+  id: 'graph1',
+  latex: '(t, \\cos t)',
+  parametricDomain: { min: '0', max: 'a' },
+})
+calculator.setExpression({
+  id: 'a',
+  latex: `a=${3}`,
+})
+
+document.body.append(elt)
+
 // Scene setup
 const scene = new THREE.Scene()
 scene.background = new THREE.Color(0xffffff)
@@ -119,7 +141,11 @@ controls.enablePan = true
 
 // ---------------- Update Desmos Function ----------------
 function updateDesmos() {
-  calculator.setBlank()
+  calculator.removeExpression({ id: 'a' })
+  calculator.setExpression({
+    id: 'a',
+    latex: `a=${currentScale.toFixed(2)}`,
+  })
 }
 
 // ---------------- Update Cones Function ----------------
@@ -210,28 +236,6 @@ const minScale = 0.01
 const maxScale = 1.01
 let currentScale = 0.01
 let currentFrame = 0
-
-//Desmos setup
-const elt = document.createElement('div')
-elt.style.width = `${window.innerWidth}`
-elt.style.height = '400px'
-
-const calculator = Desmos.GraphingCalculator(elt, {
-  keypad: false,
-  expressionsCollapsed: false,
-  settingsMenu: false,
-})
-calculator.setExpression({
-  id: 'graph1',
-  latex: '(t, \\cos t)',
-  parametricDomain: { min: '0', max: 'a' },
-})
-calculator.setExpression({
-  id: 'a',
-  latex: `a=${3}`,
-})
-
-document.body.append(elt)
 
 function animate() {
   requestAnimationFrame(animate)

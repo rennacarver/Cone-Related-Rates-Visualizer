@@ -117,6 +117,12 @@ controls.enableRotate = true
 controls.enableZoom = true
 controls.enablePan = true
 
+// ---------------- Update Desmos Function ----------------
+function updateDesmos() {
+  //calculator.removeExpression({ id: 'a' })
+  //calculator.setExpression({ id: 'a', latex: `a=${currentScale}` })
+}
+
 // ---------------- Update Cones Function ----------------
 function updateCones() {
   // Dispose old geometries
@@ -205,6 +211,30 @@ const maxScale = 1.01
 let currentScale = 0.01
 let currentFrame = 0
 
+//Desmos setup
+const elt = document.createElement('div')
+elt.style.width = `${window.innerWidth}`
+elt.style.height = '400px'
+
+const calculator = Desmos.GraphingCalculator(elt, {
+  keypad: false,
+  expressionsCollapsed: false,
+  settingsMenu: false,
+  playing: true,
+})
+calculator.setExpression({
+  id: 'graph1',
+  latex: '(t, \\cos t)',
+  playing: true,
+  parametricDomain: { min: '0', max: 'a' },
+})
+calculator.setExpression({
+  id: 'a',
+  latex: `a=${3}`,
+})
+
+document.body.append(elt)
+
 function animate() {
   requestAnimationFrame(animate)
 
@@ -220,6 +250,9 @@ function animate() {
 
     //update Display
     updateDisplays()
+
+    //update Desmos
+    updateDesmos()
   }
 
   if (!isPlaying) {
@@ -235,6 +268,9 @@ function animate() {
 
     //update Display
     updateDisplays()
+
+    //update Desmos
+    updateDesmos()
   }
 
   controls.update()
@@ -249,17 +285,3 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix()
   renderer.setSize(window.innerWidth, window.innerHeight)
 })
-
-//Desmos setup
-const elt = document.createElement('div')
-elt.style.width = `${window.innerWidth}`
-elt.style.height = '400px'
-
-const calculator = Desmos.GraphingCalculator(elt, {
-  keypad: false,
-  expressions: false,
-  settingsMenu: false,
-})
-calculator.setExpression({ id: 'graph1', latex: 'y=x^2' })
-
-document.body.append(elt)

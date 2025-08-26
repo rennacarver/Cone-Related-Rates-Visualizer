@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import Desmos from 'desmos'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 // Scene setup
@@ -12,6 +13,7 @@ const camera = new THREE.PerspectiveCamera(
   1000
 )
 camera.position.z = 5
+camera.position.y = 3
 
 const renderer = new THREE.WebGLRenderer()
 renderer.setSize(window.innerWidth, window.innerHeight)
@@ -70,8 +72,8 @@ const waterGeometry = new THREE.ConeGeometry(
   coneSegments
 )
 const videoTexture = new THREE.VideoTexture(video)
-//const waterMaterial = new THREE.MeshBasicMaterial({ map: videoTexture })
-const waterMaterial = new THREE.MeshToonMaterial({ color: 0x87ceeb }) // Sky blue
+const waterMaterial = new THREE.MeshBasicMaterial({ map: videoTexture })
+//const waterMaterial = new THREE.MeshToonMaterial({ color: 0x87ceeb }) // Sky blue
 const waterCone = new THREE.Mesh(waterGeometry, waterMaterial)
 waterCone.rotation.x = Math.PI
 waterCone.position.z = 0.001 // tiny offset to prevent z-fighting
@@ -115,6 +117,12 @@ controls.enableRotate = true
 controls.enableZoom = true
 controls.enablePan = true
 
+// ---------------- Update Desmos Function ----------------
+function updateDesmos() {
+  //calculator.removeExpression({ id: 'a' })
+  //calculator.setExpression({ id: 'a', latex: `a=${currentScale}` })
+}
+
 // ---------------- Update Cones Function ----------------
 function updateCones() {
   // Dispose old geometries
@@ -148,33 +156,122 @@ function updateCones() {
   waterGroup.position.y = (coneHeight * waterGroup.scale.y) / 2
 }
 
+// ---------------- Dimension Display --------------
+const volumeDisplay = document.getElementById('volume-display')
+const radiusDisplay = document.getElementById('radius-display')
+const heightDisplay = document.getElementById('height-display')
+
+function updateDisplays() {
+  const volume =
+    (1 / 3) *
+    Math.PI *
+    coneRadius *
+    coneRadius *
+    coneHeight *
+    currentScale *
+    currentScale *
+    currentScale
+  volumeDisplay.textContent = volume.toFixed(2)
+
+  radiusDisplay.textContent = (coneRadius * currentScale).toFixed(2)
+  heightDisplay.textContent = (coneHeight * currentScale).toFixed(2)
+}
+
 // ---------------- Input Listeners ----------------
 document.getElementById('heightInput').addEventListener('input', (e) => {
   coneHeight = parseFloat(e.target.value)
   updateCones()
+  updateDisplays()
 })
 
 document.getElementById('radiusInput').addEventListener('input', (e) => {
   coneRadius = parseFloat(e.target.value)
   updateCones()
+  updateDisplays()
+})
+
+const playPauseButton = document.getElementById('play-pause-button')
+playPauseButton.addEventListener('click', () => {
+  isPlaying = !isPlaying
+  playPauseButton.textContent = isPlaying ? 'Pause' : 'Play'
+})
+
+const animationSlider = document.getElementById('animation-slider')
+
+animationSlider.addEventListener('click', () => {
+  isPlaying = false
+  playPauseButton.textContent = isPlaying ? 'Pause' : 'Play'
 })
 
 // ---------------- Animation ----------------
+let isPlaying = true
 let scaleDirection = 1
 const minScale = 0.01
 const maxScale = 1.01
 let currentScale = 0.01
+let currentFrame = 0
+
+//Desmos setup
+const elt = document.createElement('div')
+elt.style.width = `${window.innerWidth}`
+elt.style.height = '400px'
+
+const calculator = Desmos.GraphingCalculator(elt, {
+  keypad: false,
+  expressionsCollapsed: false,
+  settingsMenu: false,
+  playing: true,
+})
+calculator.setExpression({
+  id: 'graph1',
+  latex: '(t, \\cos t)',
+  playing: true,
+  parametricDomain: { min: '0', max: 'a' },
+})
+calculator.setExpression({
+  id: 'a',
+  latex: `a=${3}`,
+})
+
+document.body.append(elt)
 
 function animate() {
   requestAnimationFrame(animate)
 
-  // Animate scaling of waterGroup (cone + edges)
-  currentScale += scaleDirection * 0.001
-  if (currentScale > maxScale || currentScale < minScale) scaleDirection *= -1
-  waterGroup.scale.set(currentScale, currentScale, currentScale)
+  if (isPlaying) {
+    // Animate scaling of waterGroup (cone + edges)
+    currentScale += scaleDirection * 0.001
+    animationSlider.value = currentScale * 1000
+    if (currentScale > maxScale || currentScale < minScale) scaleDirection *= -1
+    waterGroup.scale.set(currentScale, currentScale, currentScale)
 
-  // Keep base aligned
-  waterGroup.position.y = (coneHeight * currentScale) / 2
+    // Keep base aligned
+    waterGroup.position.y = (coneHeight * currentScale) / 2
+
+    //update Display
+    updateDisplays()
+
+    //update Desmos
+    updateDesmos()
+  }
+
+  if (!isPlaying) {
+    // Update current frame based on slider value
+    currentFrame = animationSlider.value / 1000
+    currentScale = currentFrame
+
+    // Animate scaling of waterGroup (cone + edges)
+    waterGroup.scale.set(currentFrame, currentFrame, currentFrame)
+
+    // Keep base aligned
+    waterGroup.position.y = (coneHeight * waterGroup.scale.y) / 2
+
+    //update Display
+    updateDisplays()
+
+    //update Desmos
+    updateDesmos()
+  }
 
   controls.update()
   renderer.render(scene, camera)

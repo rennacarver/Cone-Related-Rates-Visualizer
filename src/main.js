@@ -4,12 +4,12 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 //Desmos setup
 const elt = document.createElement('div')
-elt.style.width = `${window.innerWidth}`
+elt.style.width = `${window.innerWidth / 2}`
 elt.style.height = '400px'
 
 const calculator = Desmos.GraphingCalculator(elt, {
   keypad: false,
-  expressionsCollapsed: false,
+  expressionsCollapsed: true,
   settingsMenu: false,
 })
 calculator.setExpression({
@@ -169,6 +169,12 @@ function updateDesmos() {
     id: 'h',
     latex: `h=${(currentScale * coneHeight).toFixed(2)}`,
   })
+  calculator.setMathBounds({
+    left: Math.floor(0 - maxScale / 2),
+    right: maxScale * 1.5,
+    bottom: -0.5 * maxScale,
+    top: calculateYMax() + calculateYMax() / 2,
+  })
 }
 
 // ---------------- Update Cones Function ----------------
@@ -224,6 +230,11 @@ function calculateRadius() {
 
 function calculateHeight() {
   return coneHeight * currentScale
+}
+
+// ---------------- Calculate Desmos Window Zoom ----------------
+function calculateYMax() {
+  return Math.max(calculateVolume(), calculateRadius(), calculateHeight())
 }
 
 // ---------------- Dimension Display --------------

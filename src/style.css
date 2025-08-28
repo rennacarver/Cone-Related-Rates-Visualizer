@@ -1,4 +1,4 @@
-:root {
+/* :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -11,7 +11,7 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
+} */
 
 #bar-container {
   width: 200px;
@@ -22,7 +22,19 @@
 #volume-bar {
   width: 0%;
   height: 100%;
-  background-color: #4caf50;
+  background-color: #5b429f;
+}
+
+#radius-bar {
+  width: 0%;
+  height: 100%;
+  background-color: #3e6eac;
+}
+
+#height-bar {
+  width: 0%;
+  height: 100%;
+  background-color: #b84d46;
 }
 
 #info {

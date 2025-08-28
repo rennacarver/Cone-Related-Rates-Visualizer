@@ -218,6 +218,19 @@ function updateCones() {
   waterGroup.position.y = (coneHeight * waterGroup.scale.y) / 2
 }
 
+// ---------------- Update Value Bars ----------------
+function updateValueBars() {
+  volumeBar.style.width = `${
+    barLength * (calculateVolume() / calculateBarsMax())
+  }px`
+  radiusBar.style.width = `${
+    barLength * (calculateRadius() / calculateBarsMax())
+  }px`
+  heightBar.style.width = `${
+    barLength * (calculateHeight() / calculateBarsMax())
+  }px`
+}
+
 // ---------------- Math Formulas --------------
 function calculateVolume() {
   return (
@@ -243,6 +256,15 @@ function calculateHeight() {
 // ---------------- Calculate Desmos Window Zoom ----------------
 function calculateYMax() {
   return Math.max(calculateVolume(), calculateRadius(), calculateHeight())
+}
+
+// ---------------- Calculate Value Bars Range ----------------
+function calculateBarsMax() {
+  return Math.max(
+    coneHeight,
+    coneRadius,
+    (1 / 3) * Math.PI * coneHeight * coneRadius * coneRadius
+  )
 }
 
 // ---------------- Dimension Display --------------
@@ -289,8 +311,9 @@ animationSlider.addEventListener('click', () => {
 
 // ---------------- Value Bars ----------------
 const volumeBar = document.getElementById('volume-bar')
-let width = 200
-let growing = true
+const radiusBar = document.getElementById('radius-bar')
+const heightBar = document.getElementById('height-bar')
+const barLength = 200
 
 // ---------------- Animation ----------------
 let isPlaying = true
@@ -307,17 +330,14 @@ function animate() {
     // Animate scaling of waterGroup (cone + edges)
     currentScale += scaleDirection * 0.001
     animationSlider.value = currentScale * 1000
-    volumeBar.style.width = `${200 * currentScale}px`
     if (currentScale > maxScale || currentScale < minScale) scaleDirection *= -1
     waterGroup.scale.set(currentScale, currentScale, currentScale)
 
     // Keep base aligned
     waterGroup.position.y = (coneHeight * currentScale) / 2
 
-    //update Display
+    updateValueBars()
     updateDisplays()
-
-    //update Desmos
     updateDesmos()
   }
 
@@ -332,10 +352,8 @@ function animate() {
     // Keep base aligned
     waterGroup.position.y = (coneHeight * waterGroup.scale.y) / 2
 
-    //update Display
+    updateValueBars()
     updateDisplays()
-
-    //update Desmos
     updateDesmos()
   }
 

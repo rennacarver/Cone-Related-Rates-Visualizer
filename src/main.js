@@ -287,6 +287,11 @@ animationSlider.addEventListener('click', () => {
   updateDesmos()
 })
 
+// ---------------- Value Bars ----------------
+const volumeBar = document.getElementById('volume-bar')
+let width = 200
+let growing = true
+
 // ---------------- Animation ----------------
 let isPlaying = true
 let scaleDirection = 1
@@ -302,6 +307,7 @@ function animate() {
     // Animate scaling of waterGroup (cone + edges)
     currentScale += scaleDirection * 0.001
     animationSlider.value = currentScale * 1000
+    volumeBar.style.width = `${200 * currentScale}px`
     if (currentScale > maxScale || currentScale < minScale) scaleDirection *= -1
     waterGroup.scale.set(currentScale, currentScale, currentScale)
 

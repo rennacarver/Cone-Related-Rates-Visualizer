@@ -13,11 +13,16 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.bar {
-  width: 0;
+#bar-container {
+  width: 200px;
   height: 20px;
+  border: 1px solid #ccc;
+}
+
+#volume-bar {
+  width: 0%;
+  height: 100%;
   background-color: #4caf50;
-  transition: width0.5s;
 }
 
 #info {

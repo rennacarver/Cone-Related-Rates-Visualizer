@@ -59,7 +59,7 @@ const canvas = document.getElementById('threejs-canvas')
 
 // Set new dimensions
 canvas.width = window.innerWidth / 2 // New width in pixels
-canvas.height = 100 // New height in pixels
+canvas.height = window.innerHeight / 5 // New height in pixels
 
 // Load water video
 const video = document.createElement('video')
@@ -343,7 +343,7 @@ animate()
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight
   camera.updateProjectionMatrix()
-  renderer.setSize(window.innerWidth / 2, window.innerHeight)
+  renderer.setSize(window.innerWidth / 2, window.innerHeight / 5)
   elt.style.width = window.innerWidth / 2
   elt.style.height = '400px'
 })

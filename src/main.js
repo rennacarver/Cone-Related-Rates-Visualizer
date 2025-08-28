@@ -3,8 +3,8 @@ import Desmos from 'desmos'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 //Desmos setup
-const elt = document.createElement('div')
-elt.style.width = `${window.innerWidth / 2}`
+const elt = document.getElementById('desmos-graph')
+elt.style.width = window.innerWidth / 2
 elt.style.height = '400px'
 
 const calculator = Desmos.GraphingCalculator(elt, {
@@ -49,9 +49,17 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.z = 5
 camera.position.y = 3
 
-const renderer = new THREE.WebGLRenderer()
-renderer.setSize(window.innerWidth, window.innerHeight)
-document.body.appendChild(renderer.domElement)
+const renderer = new THREE.WebGLRenderer({
+  canvas: document.getElementById('threejs-canvas'),
+  antialias: true,
+})
+
+// Set three.js Canvas size
+const canvas = document.getElementById('threejs-canvas')
+
+// Set new dimensions
+canvas.width = window.innerWidth / 2 // New width in pixels
+canvas.height = 100 // New height in pixels
 
 // Load water video
 const video = document.createElement('video')
@@ -170,9 +178,9 @@ function updateDesmos() {
     latex: `h=${(currentScale * coneHeight).toFixed(2)}`,
   })
   calculator.setMathBounds({
-    left: Math.floor(0 - maxScale / 2),
+    left: -0.5 * maxScale,
     right: maxScale * 1.5,
-    bottom: -0.5 * maxScale,
+    bottom: -0.5 * calculateYMax(),
     top: calculateYMax() + calculateYMax() / 2,
   })
 }
@@ -255,12 +263,14 @@ document.getElementById('heightInput').addEventListener('input', (e) => {
   coneHeight = parseFloat(e.target.value)
   updateCones()
   updateDisplays()
+  updateDesmos()
 })
 
 document.getElementById('radiusInput').addEventListener('input', (e) => {
   coneRadius = parseFloat(e.target.value)
   updateCones()
   updateDisplays()
+  updateDesmos()
 })
 
 const playPauseButton = document.getElementById('play-pause-button')
@@ -300,6 +310,9 @@ function animate() {
 
     //update Display
     updateDisplays()
+
+    //update Desmos
+    updateDesmos()
   }
 
   if (!isPlaying) {
@@ -315,6 +328,9 @@ function animate() {
 
     //update Display
     updateDisplays()
+
+    //update Desmos
+    updateDesmos()
   }
 
   controls.update()
@@ -327,5 +343,7 @@ animate()
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight
   camera.updateProjectionMatrix()
-  renderer.setSize(window.innerWidth, window.innerHeight)
+  renderer.setSize(window.innerWidth / 2, window.innerHeight)
+  elt.style.width = window.innerWidth / 2
+  elt.style.height = '400px'
 })

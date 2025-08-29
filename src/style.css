@@ -55,14 +55,3 @@ canvas {
 #desmos-graph {
   margin-top: 2rem;
 }
-
-#slider-container {
-  display: inline-flex;
-  align-items: center;
-  vertical-align: middle;
-}
-
-#fixedScaleInputs,
-#fixedFlowInputs {
-  padding: 5px;
-}

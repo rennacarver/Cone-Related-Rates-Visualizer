@@ -88,6 +88,23 @@ let currHeight = 0
 
 // Initial states
 let radioButtonsState = document.querySelector('input[name="rateType"]').value
+// let radiusRateMax = 0
+// let heightRateMax = 0
+// let volumeRateMax = 0
+
+// Set max values for rate inputs
+function setRateMaxes() {
+  document.getElementById('volumeRateInput').max = (
+    (1 / 3) *
+    Math.PI *
+    coneRadius *
+    coneRadius *
+    coneHeight
+  ).toFixed(2)
+  document.getElementById('heightRateInput').max = coneHeight.toFixed(2)
+  document.getElementById('radiusRateInput').max = coneRadius.toFixed(2)
+}
+setRateMaxes()
 
 // ---------------- Container Cone (static) ----------------
 const containerGeometry = new THREE.ConeGeometry(
@@ -313,12 +330,20 @@ document.getElementById('heightRateInput').addEventListener('input', (e) => {
   heightRate = parseFloat(e.target.value)
   updateDisplays()
   updateDesmos()
+
+  // Keep height and radius locked
+  radiusRate = heightRate * (coneRadius / coneHeight)
+  document.getElementById('radiusRateInput').value = radiusRate
 })
 
 document.getElementById('radiusRateInput').addEventListener('input', (e) => {
   radiusRate = parseFloat(e.target.value)
   updateDisplays()
   updateDesmos()
+
+  // Keep height and radius locked
+  heightRate = radiusRate * (coneHeight / coneRadius)
+  document.getElementById('heightRateInput').value = heightRate
 })
 
 const radioButtons = document.querySelectorAll('input[name="rateType"]')
@@ -366,6 +391,7 @@ document.getElementById('heightInput').addEventListener('input', (e) => {
   updateCones()
   updateDisplays()
   updateDesmos()
+  setRateMaxes()
 })
 
 document.getElementById('radiusInput').addEventListener('input', (e) => {
@@ -381,6 +407,7 @@ document.getElementById('radiusInput').addEventListener('input', (e) => {
   updateCones()
   updateDisplays()
   updateDesmos()
+  setRateMaxes()
 })
 
 const playPauseButton = document.getElementById('play-pause-button')
@@ -419,14 +446,18 @@ function animate() {
 
   if (isPlaying) {
     // Animate scaling of waterGroup (cone + edges)
-    fixedVolume += volumeRate * scaleDirection
-    currHeight = calculateHfromV()
-    //console.log(`currHeight: ${currHeight}`)
-    //console.log(`fixedVolume: ${fixedVolume}`)
-    //console.log(`currentScale: ${currHeight - prevHeight}`)
-    currentScale += scaleDirection * 0.001
-    //currentScale += scaleDirection * (currHeight / prevHeight)
-    prevHeight = currHeight
+
+    // Constant radius rate
+    if (radioButtonsState === 'radiusRate') {
+      currentScale += scaleDirection * radiusRate * 2
+    }
+    if (radioButtonsState === 'heightRate') {
+      currentScale += scaleDirection * 0.002
+    }
+    if (radioButtonsState === 'volumeFlowRate') {
+      currentScale += scaleDirection * 0.003
+    }
+
     animationSlider.value = currentScale * 1000
     if (currentScale > maxScale || currentScale < minScale) scaleDirection *= -1
     waterGroup.scale.set(currentScale, currentScale, currentScale)

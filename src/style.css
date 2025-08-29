@@ -61,3 +61,8 @@ canvas {
   align-items: center;
   vertical-align: middle;
 }
+
+#fixedScaleInputs,
+#fixedFlowInputs {
+  padding: 5px;
+}

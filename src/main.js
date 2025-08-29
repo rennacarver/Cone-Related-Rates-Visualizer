@@ -72,9 +72,14 @@ video.play()
 
 // Initial cone parameters
 let volumeRate = parseFloat(document.getElementById('volumeRateInput').value)
+let radiusRate = parseFloat(document.getElementById('radiusRateInput').value)
+let heightRate = parseFloat(document.getElementById('heightRateInput').value)
 let coneHeight = parseFloat(document.getElementById('heightInput').value)
 let coneRadius = parseFloat(document.getElementById('radiusInput').value)
+let fixedVolume = 0
 let volume = 0
+let prevHeight = 0
+let currHeight = 0
 let coneSegments = 32
 let thresholdAngle = 30
 
@@ -270,6 +275,14 @@ function calculateBarsMax() {
   )
 }
 
+// ---------------- Calculate H from Fixed V ----------------
+function calculateHfromV() {
+  return Math.pow(
+    (3 * fixedVolume) / (Math.PI * (coneRadius / coneHeight)),
+    1 / 3
+  )
+}
+
 // ---------------- Dimension Display --------------
 const volumeDisplay = document.getElementById('volume-display')
 const radiusDisplay = document.getElementById('radius-display')
@@ -286,9 +299,44 @@ function updateDisplays() {
 // ---------------- Input Listeners ----------------
 document.getElementById('volumeRateInput').addEventListener('input', (e) => {
   volumeRate = parseFloat(e.target.value)
-  updateCones()
   updateDisplays()
   updateDesmos()
+})
+
+document.getElementById('heightRateInput').addEventListener('input', (e) => {
+  heightRate = parseFloat(e.target.value)
+  updateDisplays()
+  updateDesmos()
+})
+
+document.getElementById('radiusRateInput').addEventListener('input', (e) => {
+  radiusRate = parseFloat(e.target.value)
+  updateDisplays()
+  updateDesmos()
+})
+
+const radioButtons = document.querySelectorAll('input[name="rateType"]')
+radioButtons.forEach((button) => {
+  button.addEventListener('change', function () {
+    if (this.value === 'volumeFlowRate') {
+      isFlowFixed = true
+      document.getElementById('volumeRateInput').disabled = false
+      document.getElementById('radiusRateInput').disabled = true
+      document.getElementById('heightRateInput').disabled = true
+    }
+    if (this.value === 'radiusRate') {
+      isFlowFixed = false
+      document.getElementById('volumeRateInput').disabled = true
+      document.getElementById('radiusRateInput').disabled = false
+      document.getElementById('heightRateInput').disabled = true
+    }
+    if (this.value === 'heightRate') {
+      isFlowFixed = false
+      document.getElementById('volumeRateInput').disabled = true
+      document.getElementById('radiusRateInput').disabled = true
+      document.getElementById('heightRateInput').disabled = false
+    }
+  })
 })
 
 document.getElementById('heightInput').addEventListener('input', (e) => {
@@ -325,20 +373,30 @@ const radiusBar = document.getElementById('radius-bar')
 const heightBar = document.getElementById('height-bar')
 const barLength = 200
 
-// ---------------- Animation ----------------
+// ---------------- Animation for Fixed Radius/Height Scale ----------------
 let isPlaying = true
 let scaleDirection = 1
 const minScale = 0.01
 const maxScale = 1.01
 let currentScale = 0.01
 
+// ---------------- Animation for Fixed Volume Flow Rate ----------------
+let isFlowFixed = false
+let maxVScale = calculateVolume()
+
 function animate() {
   requestAnimationFrame(animate)
 
   if (isPlaying) {
     // Animate scaling of waterGroup (cone + edges)
-    volume += volumeRate
+    fixedVolume += volumeRate * scaleDirection
+    currHeight = calculateHfromV()
+    //console.log(`currHeight: ${currHeight}`)
+    //console.log(`fixedVolume: ${fixedVolume}`)
+    //console.log(`currentScale: ${currHeight - prevHeight}`)
     currentScale += scaleDirection * 0.001
+    //currentScale += scaleDirection * (currHeight / prevHeight)
+    prevHeight = currHeight
     animationSlider.value = currentScale * 1000
     if (currentScale > maxScale || currentScale < minScale) scaleDirection *= -1
     waterGroup.scale.set(currentScale, currentScale, currentScale)
@@ -354,6 +412,7 @@ function animate() {
   if (!isPlaying) {
     // Update current frame based on slider value
     currentScale = animationSlider.value / 1000
+    fixedVolume = (animationSlider.value / 1000) * calculateVolume()
 
     // Animate scaling of waterGroup (cone + edges)
     waterGroup.scale.set(currentScale, currentScale, currentScale)

@@ -70,18 +70,24 @@ video.src = 'water2.mp4'
 video.playbackRate = 0.5
 video.play()
 
-// Initial cone parameters
-let volumeRate = parseFloat(document.getElementById('volumeRateInput').value)
-let radiusRate = parseFloat(document.getElementById('radiusRateInput').value)
-let heightRate = parseFloat(document.getElementById('heightRateInput').value)
+// Initial container cone parameters
 let coneHeight = parseFloat(document.getElementById('heightInput').value)
 let coneRadius = parseFloat(document.getElementById('radiusInput').value)
+let coneSegments = 32
+let thresholdAngle = 30
+
+// Initial liquid cone conditions
+let volumeRate = parseFloat(document.getElementById('volumeRateInput').value)
+let heightRate = parseFloat(document.getElementById('heightRateInput').value)
+let radiusRate = heightRate * (coneRadius / coneHeight)
+document.getElementById('radiusRateInput').value = radiusRate
 let fixedVolume = 0
 let volume = 0
 let prevHeight = 0
 let currHeight = 0
-let coneSegments = 32
-let thresholdAngle = 30
+
+// Initial states
+let radioButtonsState = document.querySelector('input[name="rateType"]').value
 
 // ---------------- Container Cone (static) ----------------
 const containerGeometry = new THREE.ConeGeometry(
@@ -318,29 +324,45 @@ document.getElementById('radiusRateInput').addEventListener('input', (e) => {
 const radioButtons = document.querySelectorAll('input[name="rateType"]')
 radioButtons.forEach((button) => {
   button.addEventListener('change', function () {
+    let vri = document.getElementById('volumeRateInput')
+    let rri = document.getElementById('radiusRateInput')
+    let hri = document.getElementById('heightRateInput')
     if (this.value === 'volumeFlowRate') {
       isFlowFixed = true
-      document.getElementById('volumeRateInput').disabled = false
-      document.getElementById('radiusRateInput').disabled = true
-      document.getElementById('heightRateInput').disabled = true
+      vri.disabled = false
+      rri.disabled = true
+      hri.disabled = true
     }
     if (this.value === 'radiusRate') {
       isFlowFixed = false
-      document.getElementById('volumeRateInput').disabled = true
-      document.getElementById('radiusRateInput').disabled = false
-      document.getElementById('heightRateInput').disabled = true
+      vri.disabled = true
+      rri.disabled = false
+      hri.disabled = true
+      heightRate = radiusRate * (coneHeight / coneRadius)
+      document.getElementById('heightRateInput').value = heightRate
     }
     if (this.value === 'heightRate') {
       isFlowFixed = false
-      document.getElementById('volumeRateInput').disabled = true
-      document.getElementById('radiusRateInput').disabled = true
-      document.getElementById('heightRateInput').disabled = false
+      vri.disabled = true
+      rri.disabled = true
+      hri.disabled = false
+      radiusRate = heightRate * (coneRadius / coneHeight)
+      document.getElementById('radiusRateInput').value = radiusRate
     }
+    radioButtonsState = this.value
   })
 })
 
 document.getElementById('heightInput').addEventListener('input', (e) => {
   coneHeight = parseFloat(e.target.value)
+  if (radioButtonsState === 'heightRate') {
+    radiusRate = heightRate * (coneRadius / coneHeight)
+    document.getElementById('radiusRateInput').value = radiusRate
+  }
+  if (radioButtonsState === 'radiusRate') {
+    heightRate = radiusRate * (coneHeight / coneRadius)
+    document.getElementById('heightRateInput').value = heightRate
+  }
   updateCones()
   updateDisplays()
   updateDesmos()
@@ -348,6 +370,14 @@ document.getElementById('heightInput').addEventListener('input', (e) => {
 
 document.getElementById('radiusInput').addEventListener('input', (e) => {
   coneRadius = parseFloat(e.target.value)
+  if (radioButtonsState === 'heightRate') {
+    radiusRate = heightRate * (coneRadius / coneHeight)
+    document.getElementById('radiusRateInput').value = radiusRate
+  }
+  if (radioButtonsState === 'radiusRate') {
+    heightRate = radiusRate * (coneHeight / coneRadius)
+    document.getElementById('heightRateInput').value = heightRate
+  }
   updateCones()
   updateDisplays()
   updateDesmos()

@@ -9,10 +9,10 @@ elt.style.height = '400px'
 
 const calculator = Desmos.GraphingCalculator(elt, {
   keypad: false,
-  expressionsCollapsed: true,
+  expressionsCollapsed: false,
   settingsMenu: false,
   zoomButtons: false,
-  expressions: false,
+  expressions: true,
 })
 calculator.setExpression({
   id: 'Volume',
@@ -91,7 +91,7 @@ document.getElementById('radiusRate').checked = true
 document.getElementById('radiusRateInput').disabled = false
 document.getElementById('volumeRateInput').disabled = true
 document.getElementById('heightRateInput').disabled = true
-let radioButtonsState = document.querySelector('input[name="rateType"]').value
+let radioButtonsState = 'radiusRate'
 
 // Set max values for rate inputs
 function setRateMaxes() {
@@ -198,7 +198,7 @@ function updateDesmos() {
   calculator.removeExpression({ id: 'h' })
   calculator.setExpression({
     id: 'a',
-    latex: `a=${currentScale.toFixed(2)}`,
+    latex: `a=${t.toFixed(2)}`,
   })
   calculator.setExpression({
     id: 'r',
@@ -211,7 +211,7 @@ function updateDesmos() {
   })
   calculator.setMathBounds({
     left: -0.2 * maxScale,
-    right: maxScale * 1.2,
+    right: t,
     bottom: -0.5 * calculateYMax(),
     top: calculateYMax(),
   })
@@ -457,41 +457,43 @@ function animate() {
     }
     // Calculate time elapsed in milliseconds
     elapsed = Date.now() - startTime
-    if (elapsed < 1000) {
-    } else {
+    if (elapsed > 1000) {
       t += 1 * scaleDirection
+      if (t < 0) t = 0
       console.log(`Seconds elapsed: ${t}`)
       elapsed = 0
       startTime = undefined
       if (radioButtonsState === 'radiusRate') {
         currentScale += scaleDirection * (radiusRate / coneRadius)
+        if (currentScale <= 0) currentScale = minScale
+        if (currentScale > maxScale) currentScale = maxScale
+        if (currentScale >= maxScale || currentScale <= minScale)
+          scaleDirection *= -1
       }
       if (radioButtonsState === 'heightRate') {
         currentScale += scaleDirection * (heightRate / coneHeight)
+        if (currentScale <= 0) currentScale = minScale
+        if (currentScale > maxScale) currentScale = maxScale
+        if (currentScale >= maxScale || currentScale <= minScale)
+          scaleDirection *= -1
       }
       if (radioButtonsState === 'volumeFlowRate') {
         fixedVolume += volumeRate * scaleDirection
         console.log(`fixedVolume: ${fixedVolume}`)
         currHeight = Math.pow(
-          (3 * fixedVolume) / (Math.PI * (coneRadius / coneHeight)),
+          (3 * fixedVolume) / (Math.PI * Math.pow(coneRadius / coneHeight, 2)),
           1 / 3
         )
-        if (currHeight === 0) currHeight = 0.01
-        if (prevHeight === 0) prevHeight = 0.01
         console.log(`currHeight:${currHeight}`)
-        //console.log(`prevHeight:${prevHeight}`)
-        console.log(`curr/cone:${currHeight / coneHeight}`)
-        currentScale += scaleDirection * (volumeRate / 10)
-        prevHeight = currHeight
+        console.log(`currHeight/coneHeight:${currHeight / coneHeight}`)
+        currentScale = scaleDirection * (currHeight / coneHeight)
+        console.log(`currentScale:${currentScale}`)
+        if (currentScale <= 0) currentScale = minScale
+        if (currentScale > maxScale) currentScale = maxScale
+        if (currHeight >= coneHeight || currHeight <= 0) scaleDirection *= 1
       }
     }
 
-    if (currentScale > maxScale || currentScale < minScale) {
-      scaleDirection *= -1
-      if (currentScale > maxScale) currentScale = maxScale
-      if (currentScale < minScale) currentScale = minScale
-      console.log('scale direction changed')
-    }
     animationSlider.value = currentScale * 1000
     waterGroup.scale.set(currentScale, currentScale, currentScale)
 
@@ -507,6 +509,7 @@ function animate() {
     // Update current frame based on slider value
     currentScale = animationSlider.value / 1000
     fixedVolume = (animationSlider.value / 1000) * calculateVolume()
+    startTime = undefined
 
     // Animate scaling of waterGroup (cone + edges)
     waterGroup.scale.set(currentScale, currentScale, currentScale)

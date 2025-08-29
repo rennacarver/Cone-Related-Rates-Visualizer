@@ -87,7 +87,7 @@ let prevHeight = 0
 let currHeight = 0
 
 // Initial states
-document.querySelector('input[name="rateType"]').value = 'radiusRate'
+document.getElementById('radiusRate').checked = true
 document.getElementById('radiusRateInput').disabled = false
 document.getElementById('volumeRateInput').disabled = true
 document.getElementById('heightRateInput').disabled = true
@@ -376,6 +376,7 @@ radioButtons.forEach((button) => {
       document.getElementById('radiusRateInput').value = radiusRate
     }
     radioButtonsState = this.value
+    console.log(this.value)
   })
 })
 
@@ -469,11 +470,12 @@ function animate() {
       if (radioButtonsState === 'heightRate') {
         currentScale += scaleDirection * (heightRate / coneHeight)
       }
+      if (radioButtonsState === 'volumeFlowRate') {
+        fixedVolume += volumeRate
+        console.log(`volume rate: ${volumeRate}`)
+        currentScale += scaleDirection * (volumeRate / 10)
+      }
     }
-
-    // if (radioButtonsState === 'volumeFlowRate') {
-    //   currentScale += scaleDirection * (elapsed / 1000) * volumeRate
-    // }
 
     if (currentScale > maxScale || currentScale < minScale) {
       scaleDirection *= -1

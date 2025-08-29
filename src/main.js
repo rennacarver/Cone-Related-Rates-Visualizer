@@ -87,10 +87,11 @@ let prevHeight = 0
 let currHeight = 0
 
 // Initial states
+document.querySelector('input[name="rateType"]').value = 'radiusRate'
+document.getElementById('radiusRateInput').disabled = false
+document.getElementById('volumeRateInput').disabled = true
+document.getElementById('heightRateInput').disabled = true
 let radioButtonsState = document.querySelector('input[name="rateType"]').value
-// let radiusRateMax = 0
-// let heightRateMax = 0
-// let volumeRateMax = 0
 
 // Set max values for rate inputs
 function setRateMaxes() {
@@ -432,11 +433,12 @@ const barLength = 200
 
 // ---------------- Animation for Fixed Radius/Height Scale ----------------
 let t = 0
+let elapsed = 0
 let startTime
 let isPlaying = true
 let scaleDirection = 1
 const minScale = 0.01
-const maxScale = 1.01
+const maxScale = 1.001
 let currentScale = 0.01
 
 // ---------------- Animation for Fixed Volume Flow Rate ----------------
@@ -447,37 +449,39 @@ function animate() {
   requestAnimationFrame(animate)
 
   if (isPlaying) {
+    // Create a 1 second counter
+
+    // Set the start time on the first frame
     if (startTime === undefined) {
-      startTime = Date.now() // Set the start time on the first frame
+      startTime = Date.now()
     }
-
-    let elapsed = Date.now() - startTime // Calculate time elapsed in milliseconds
-
-    // Use `elapsed` to calculate animation properties
-    // For example, to make a bar fill up over 1 second:
+    // Calculate time elapsed in milliseconds
+    elapsed = Date.now() - startTime
     if (elapsed < 1000) {
-      //console.log(`elapsed:${elapsed}`)
     } else {
-      // End the animation or reset
-      t += 1
+      t += 1 * scaleDirection
       console.log(`Seconds elapsed: ${t}`)
       elapsed = 0
       startTime = undefined
+      if (radioButtonsState === 'radiusRate') {
+        currentScale += scaleDirection * (radiusRate / coneRadius)
+      }
+      if (radioButtonsState === 'heightRate') {
+        currentScale += scaleDirection * (heightRate / coneHeight)
+      }
     }
 
-    // Constant radius rate
-    if (radioButtonsState === 'radiusRate') {
-      currentScale += scaleDirection * radiusRate * 2
-    }
-    if (radioButtonsState === 'heightRate') {
-      currentScale += scaleDirection * 0.002
-    }
-    if (radioButtonsState === 'volumeFlowRate') {
-      currentScale += scaleDirection * 0.003
-    }
+    // if (radioButtonsState === 'volumeFlowRate') {
+    //   currentScale += scaleDirection * (elapsed / 1000) * volumeRate
+    // }
 
+    if (currentScale > maxScale || currentScale < minScale) {
+      scaleDirection *= -1
+      if (currentScale > maxScale) currentScale = maxScale
+      if (currentScale < minScale) currentScale = minScale
+      console.log('scale direction changed')
+    }
     animationSlider.value = currentScale * 1000
-    if (currentScale > maxScale || currentScale < minScale) scaleDirection *= -1
     waterGroup.scale.set(currentScale, currentScale, currentScale)
 
     // Keep water and container cone base aligned

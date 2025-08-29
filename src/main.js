@@ -431,6 +431,8 @@ const heightBar = document.getElementById('height-bar')
 const barLength = 200
 
 // ---------------- Animation for Fixed Radius/Height Scale ----------------
+let t = 0
+let startTime
 let isPlaying = true
 let scaleDirection = 1
 const minScale = 0.01
@@ -445,7 +447,23 @@ function animate() {
   requestAnimationFrame(animate)
 
   if (isPlaying) {
-    // Animate scaling of waterGroup (cone + edges)
+    if (startTime === undefined) {
+      startTime = Date.now() // Set the start time on the first frame
+    }
+
+    let elapsed = Date.now() - startTime // Calculate time elapsed in milliseconds
+
+    // Use `elapsed` to calculate animation properties
+    // For example, to make a bar fill up over 1 second:
+    if (elapsed < 1000) {
+      //console.log(`elapsed:${elapsed}`)
+    } else {
+      // End the animation or reset
+      t += 1
+      console.log(`Seconds elapsed: ${t}`)
+      elapsed = 0
+      startTime = undefined
+    }
 
     // Constant radius rate
     if (radioButtonsState === 'radiusRate') {

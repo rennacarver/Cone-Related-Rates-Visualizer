@@ -5,6 +5,19 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <link rel="stylesheet" href="src/style.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script type="text/x-mathjax-config">
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ["\\(", "\\)"]],
+          processEscapes: true,
+        }
+      }
+    </script>
+
+    <script
+      async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    ></script>
     <title>Related Rates Visualizer</title>
   </head>
   <body>
@@ -19,8 +32,8 @@
           value="volumeFlowRate"
           checked
         />
-        <label for="volumeFlowRate">Volume Rate</label>
-        (dV/dt):
+        <label for="volumeFlowRate">\( \frac{dV}{dt} \):</label>
+
         <input
           type="number"
           id="volumeRateInput"
@@ -36,7 +49,7 @@
           name="rateType"
           value="radiusRate"
         />
-        <label for="radiusRate">Radius Rate (dr/dt):</label>
+        <label for="radiusRate">\( \frac{dr}{dt} \) :</label>
         <input
           type="number"
           id="radiusRateInput"
@@ -52,7 +65,7 @@
           name="rateType"
           value="heightRate"
         />
-        <label for="heightRate">Height Rate (dh/dt):</label>
+        <label for="heightRate">\( \frac{dh}{dt} \):</label>
         <input
           type="number"
           id="heightRateInput"
@@ -118,10 +131,5 @@
     <div id="desmos-graph"></div>
 
     <script type="module" src="/src/main.js"></script>
-    <script
-      id="MathJax-script"
-      async
-      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
-    ></script>
   </body>
 </html>

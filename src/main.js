@@ -228,14 +228,15 @@ function updateDesmos() {
     calculator.setExpression({
       id: 'Radius',
       latex:
-        '(t, \\sqrt{\\frac{\\left(3\\cdot v\\cdot t\\right)}{ \\pi\\cdot h}})',
+        '(t, \\sqrt{\\frac{\\left(3\\cdot v\\cdot t\\right)}{ \\pi\\cdot h\\cdot t}})',
       parametricDomain: { min: '0', max: 'a' },
       color: Desmos.Colors.BLUE,
       label: 'Radius',
     })
     calculator.setExpression({
       id: 'Height',
-      latex: '(t, \\frac{\\left(3\\cdot v\\cdot t\\right)}{\\pi\\cdot r^2})',
+      latex:
+        '(t, \\frac{\\left(3\\cdot v\\cdot t\\right)}{\\pi\\cdot \\left(r\\cdot t\\right)^2})',
       parametricDomain: { min: '0', max: 'a' },
       color: Desmos.Colors.RED,
       label: 'Height',
@@ -251,7 +252,7 @@ function updateDesmos() {
     })
     calculator.setExpression({
       id: 'r',
-      latex: `r=${currentScale * coneRadius.toFixed(2)}`,
+      latex: `r=${(currentScale * coneRadius).toFixed(2)}`,
       hidden: true,
     })
   }

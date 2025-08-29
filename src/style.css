@@ -42,7 +42,22 @@
 }
 
 canvas {
+  margin-top: 2rem;
   margin-left: auto;
   margin-right: auto;
   display: block;
+}
+
+#volume-formula {
+  font-size: 2rem;
+}
+
+#desmos-graph {
+  margin-top: 2rem;
+}
+
+#slider-container {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
 }

@@ -11,6 +11,8 @@ const calculator = Desmos.GraphingCalculator(elt, {
   keypad: false,
   expressionsCollapsed: true,
   settingsMenu: false,
+  zoomButtons: false,
+  expressions: false,
 })
 calculator.setExpression({
   id: 'Volume',
@@ -58,8 +60,7 @@ const renderer = new THREE.WebGLRenderer({
 const canvas = document.getElementById('threejs-canvas')
 
 // Set new dimensions
-canvas.width = window.innerWidth / 2 // New width in pixels
-canvas.height = window.innerHeight / 5 // New height in pixels
+renderer.setSize(window.innerWidth / 2, window.innerHeight / 5)
 
 // Load water video
 const video = document.createElement('video')
@@ -70,8 +71,10 @@ video.playbackRate = 0.5
 video.play()
 
 // Initial cone parameters
+let volumeRate = parseFloat(document.getElementById('volumeRateInput').value)
 let coneHeight = parseFloat(document.getElementById('heightInput').value)
 let coneRadius = parseFloat(document.getElementById('radiusInput').value)
+let volume = 0
 let coneSegments = 32
 let thresholdAngle = 30
 
@@ -178,10 +181,10 @@ function updateDesmos() {
     latex: `h=${(currentScale * coneHeight).toFixed(2)}`,
   })
   calculator.setMathBounds({
-    left: -0.5 * maxScale,
-    right: maxScale * 1.5,
+    left: -0.2 * maxScale,
+    right: maxScale * 1.2,
     bottom: -0.5 * calculateYMax(),
-    top: calculateYMax() + calculateYMax() / 2,
+    top: calculateYMax(),
   })
 }
 
@@ -273,7 +276,7 @@ const radiusDisplay = document.getElementById('radius-display')
 const heightDisplay = document.getElementById('height-display')
 
 function updateDisplays() {
-  const volume = calculateVolume()
+  volume = calculateVolume()
   volumeDisplay.textContent = volume.toFixed(2)
 
   radiusDisplay.textContent = calculateRadius().toFixed(2)
@@ -281,6 +284,13 @@ function updateDisplays() {
 }
 
 // ---------------- Input Listeners ----------------
+document.getElementById('volumeRateInput').addEventListener('input', (e) => {
+  volumeRate = parseFloat(e.target.value)
+  updateCones()
+  updateDisplays()
+  updateDesmos()
+})
+
 document.getElementById('heightInput').addEventListener('input', (e) => {
   coneHeight = parseFloat(e.target.value)
   updateCones()
@@ -321,19 +331,19 @@ let scaleDirection = 1
 const minScale = 0.01
 const maxScale = 1.01
 let currentScale = 0.01
-let currentFrame = 0
 
 function animate() {
   requestAnimationFrame(animate)
 
   if (isPlaying) {
     // Animate scaling of waterGroup (cone + edges)
+    volume += volumeRate
     currentScale += scaleDirection * 0.001
     animationSlider.value = currentScale * 1000
     if (currentScale > maxScale || currentScale < minScale) scaleDirection *= -1
     waterGroup.scale.set(currentScale, currentScale, currentScale)
 
-    // Keep base aligned
+    // Keep water and container cone base aligned
     waterGroup.position.y = (coneHeight * currentScale) / 2
 
     updateValueBars()
@@ -343,11 +353,10 @@ function animate() {
 
   if (!isPlaying) {
     // Update current frame based on slider value
-    currentFrame = animationSlider.value / 1000
-    currentScale = currentFrame
+    currentScale = animationSlider.value / 1000
 
     // Animate scaling of waterGroup (cone + edges)
-    waterGroup.scale.set(currentFrame, currentFrame, currentFrame)
+    waterGroup.scale.set(currentScale, currentScale, currentScale)
 
     // Keep base aligned
     waterGroup.position.y = (coneHeight * waterGroup.scale.y) / 2

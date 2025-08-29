@@ -2,6 +2,42 @@ import * as THREE from 'three'
 import Desmos from 'desmos'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
+//Desmos setup
+const elt = document.getElementById('desmos-graph')
+elt.style.width = window.innerWidth / 2
+elt.style.height = '400px'
+
+const calculator = Desmos.GraphingCalculator(elt, {
+  keypad: false,
+  expressionsCollapsed: true,
+  settingsMenu: false,
+  zoomButtons: false,
+  expressions: false,
+})
+calculator.setExpression({
+  id: 'Volume',
+  latex: '(t, \\frac{1}{3}\\pi (t\\cdot r)^2(t \\cdot h))',
+  parametricDomain: { min: '0', max: 'a' },
+  color: Desmos.Colors.PURPLE,
+  label: 'Volume',
+})
+calculator.setExpression({
+  id: 'Radius',
+  latex: '(t, t\\cdot r)',
+  parametricDomain: { min: '0', max: 'a' },
+  color: Desmos.Colors.BLUE,
+  label: 'Radius',
+})
+calculator.setExpression({
+  id: 'Height',
+  latex: '(t, t\\cdot h)',
+  parametricDomain: { min: '0', max: 'a' },
+  color: Desmos.Colors.RED,
+  label: 'Height',
+})
+
+document.body.append(elt)
+
 // Scene setup
 const scene = new THREE.Scene()
 scene.background = new THREE.Color(0xffffff)
@@ -15,9 +51,16 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.z = 5
 camera.position.y = 3
 
-const renderer = new THREE.WebGLRenderer()
-renderer.setSize(window.innerWidth, window.innerHeight)
-document.body.appendChild(renderer.domElement)
+const renderer = new THREE.WebGLRenderer({
+  canvas: document.getElementById('threejs-canvas'),
+  antialias: true,
+})
+
+// Set three.js Canvas size
+const canvas = document.getElementById('threejs-canvas')
+
+// Set new dimensions
+renderer.setSize(window.innerWidth / 2, window.innerHeight / 5)
 
 // Load water video
 const video = document.createElement('video')
@@ -28,8 +71,10 @@ video.playbackRate = 0.5
 video.play()
 
 // Initial cone parameters
+let volumeRate = parseFloat(document.getElementById('volumeRateInput').value)
 let coneHeight = parseFloat(document.getElementById('heightInput').value)
 let coneRadius = parseFloat(document.getElementById('radiusInput').value)
+let volume = 0
 let coneSegments = 32
 let thresholdAngle = 30
 
@@ -119,8 +164,28 @@ controls.enablePan = true
 
 // ---------------- Update Desmos Function ----------------
 function updateDesmos() {
-  //calculator.removeExpression({ id: 'a' })
-  //calculator.setExpression({ id: 'a', latex: `a=${currentScale}` })
+  calculator.removeExpression({ id: 'a' })
+  calculator.removeExpression({ id: 'r' })
+  calculator.removeExpression({ id: 'h' })
+  calculator.setExpression({
+    id: 'a',
+    latex: `a=${currentScale.toFixed(2)}`,
+  })
+  calculator.setExpression({
+    id: 'r',
+    latex: `r=${(currentScale * coneRadius).toFixed(2)}`,
+    hidden: true,
+  })
+  calculator.setExpression({
+    id: 'h',
+    latex: `h=${(currentScale * coneHeight).toFixed(2)}`,
+  })
+  calculator.setMathBounds({
+    left: -0.2 * maxScale,
+    right: maxScale * 1.2,
+    bottom: -0.5 * calculateYMax(),
+    top: calculateYMax(),
+  })
 }
 
 // ---------------- Update Cones Function ----------------
@@ -156,13 +221,22 @@ function updateCones() {
   waterGroup.position.y = (coneHeight * waterGroup.scale.y) / 2
 }
 
-// ---------------- Dimension Display --------------
-const volumeDisplay = document.getElementById('volume-display')
-const radiusDisplay = document.getElementById('radius-display')
-const heightDisplay = document.getElementById('height-display')
+// ---------------- Update Value Bars ----------------
+function updateValueBars() {
+  volumeBar.style.width = `${
+    barLength * (calculateVolume() / calculateBarsMax())
+  }px`
+  radiusBar.style.width = `${
+    barLength * (calculateRadius() / calculateBarsMax())
+  }px`
+  heightBar.style.width = `${
+    barLength * (calculateHeight() / calculateBarsMax())
+  }px`
+}
 
-function updateDisplays() {
-  const volume =
+// ---------------- Math Formulas --------------
+function calculateVolume() {
+  return (
     (1 / 3) *
     Math.PI *
     coneRadius *
@@ -171,23 +245,64 @@ function updateDisplays() {
     currentScale *
     currentScale *
     currentScale
+  )
+}
+
+function calculateRadius() {
+  return coneRadius * currentScale
+}
+
+function calculateHeight() {
+  return coneHeight * currentScale
+}
+
+// ---------------- Calculate Desmos Window Zoom ----------------
+function calculateYMax() {
+  return Math.max(calculateVolume(), calculateRadius(), calculateHeight())
+}
+
+// ---------------- Calculate Value Bars Range ----------------
+function calculateBarsMax() {
+  return Math.max(
+    coneHeight,
+    coneRadius,
+    (1 / 3) * Math.PI * coneHeight * coneRadius * coneRadius
+  )
+}
+
+// ---------------- Dimension Display --------------
+const volumeDisplay = document.getElementById('volume-display')
+const radiusDisplay = document.getElementById('radius-display')
+const heightDisplay = document.getElementById('height-display')
+
+function updateDisplays() {
+  volume = calculateVolume()
   volumeDisplay.textContent = volume.toFixed(2)
 
-  radiusDisplay.textContent = (coneRadius * currentScale).toFixed(2)
-  heightDisplay.textContent = (coneHeight * currentScale).toFixed(2)
+  radiusDisplay.textContent = calculateRadius().toFixed(2)
+  heightDisplay.textContent = calculateHeight().toFixed(2)
 }
 
 // ---------------- Input Listeners ----------------
+document.getElementById('volumeRateInput').addEventListener('input', (e) => {
+  volumeRate = parseFloat(e.target.value)
+  updateCones()
+  updateDisplays()
+  updateDesmos()
+})
+
 document.getElementById('heightInput').addEventListener('input', (e) => {
   coneHeight = parseFloat(e.target.value)
   updateCones()
   updateDisplays()
+  updateDesmos()
 })
 
 document.getElementById('radiusInput').addEventListener('input', (e) => {
   coneRadius = parseFloat(e.target.value)
   updateCones()
   updateDisplays()
+  updateDesmos()
 })
 
 const playPauseButton = document.getElementById('play-pause-button')
@@ -201,7 +316,14 @@ const animationSlider = document.getElementById('animation-slider')
 animationSlider.addEventListener('click', () => {
   isPlaying = false
   playPauseButton.textContent = isPlaying ? 'Pause' : 'Play'
+  updateDesmos()
 })
+
+// ---------------- Value Bars ----------------
+const volumeBar = document.getElementById('volume-bar')
+const radiusBar = document.getElementById('radius-bar')
+const heightBar = document.getElementById('height-bar')
+const barLength = 200
 
 // ---------------- Animation ----------------
 let isPlaying = true
@@ -210,29 +332,6 @@ const minScale = 0.01
 const maxScale = 1.01
 let currentScale = 0.01
 let currentFrame = 0
-
-//Desmos setup
-const elt = document.createElement('div')
-elt.style.width = `${window.innerWidth}`
-elt.style.height = '400px'
-
-const calculator = Desmos.GraphingCalculator(elt, {
-  keypad: false,
-  expressionsCollapsed: false,
-  settingsMenu: false,
-})
-calculator.setExpression({
-  id: 'graph1',
-  latex: '(t, \\cos t)',
-  playing: true,
-  parametricDomain: { min: '0', max: 'a' },
-})
-calculator.setExpression({
-  id: 'a',
-  latex: `a=${3}`,
-})
-
-document.body.append(elt)
 
 function animate() {
   requestAnimationFrame(animate)
@@ -244,13 +343,11 @@ function animate() {
     if (currentScale > maxScale || currentScale < minScale) scaleDirection *= -1
     waterGroup.scale.set(currentScale, currentScale, currentScale)
 
-    // Keep base aligned
+    // Keep water and container cone base aligned
     waterGroup.position.y = (coneHeight * currentScale) / 2
 
-    //update Display
+    updateValueBars()
     updateDisplays()
-
-    //update Desmos
     updateDesmos()
   }
 
@@ -265,10 +362,8 @@ function animate() {
     // Keep base aligned
     waterGroup.position.y = (coneHeight * waterGroup.scale.y) / 2
 
-    //update Display
+    updateValueBars()
     updateDisplays()
-
-    //update Desmos
     updateDesmos()
   }
 
@@ -282,5 +377,7 @@ animate()
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight
   camera.updateProjectionMatrix()
-  renderer.setSize(window.innerWidth, window.innerHeight)
+  renderer.setSize(window.innerWidth / 2, window.innerHeight / 5)
+  elt.style.width = window.innerWidth / 2
+  elt.style.height = '400px'
 })

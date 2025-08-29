@@ -5,7 +5,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 //Desmos setup
 const elt = document.getElementById('desmos-graph')
 elt.style.width = window.innerWidth / 2
-elt.style.height = '400px'
+elt.style.height = '600px'
 
 const calculator = Desmos.GraphingCalculator(elt, {
   keypad: false,
@@ -13,27 +13,6 @@ const calculator = Desmos.GraphingCalculator(elt, {
   settingsMenu: false,
   zoomButtons: false,
   expressions: true,
-})
-calculator.setExpression({
-  id: 'Volume',
-  latex: '(t, \\frac{1}{3}\\pi (t\\cdot r)^2(t \\cdot h))',
-  parametricDomain: { min: '0', max: 'a' },
-  color: Desmos.Colors.PURPLE,
-  label: 'Volume',
-})
-calculator.setExpression({
-  id: 'Radius',
-  latex: '(t, t\\cdot r)',
-  parametricDomain: { min: '0', max: 'a' },
-  color: Desmos.Colors.BLUE,
-  label: 'Radius',
-})
-calculator.setExpression({
-  id: 'Height',
-  latex: '(t, t\\cdot h)',
-  parametricDomain: { min: '0', max: 'a' },
-  color: Desmos.Colors.RED,
-  label: 'Height',
 })
 
 document.body.append(elt)
@@ -196,24 +175,91 @@ function updateDesmos() {
   calculator.removeExpression({ id: 'a' })
   calculator.removeExpression({ id: 'r' })
   calculator.removeExpression({ id: 'h' })
+  calculator.removeExpression({ id: 'Volume' })
+  calculator.removeExpression({ id: 'Radius' })
+  calculator.removeExpression({ id: 'Height' })
   calculator.setExpression({
     id: 'a',
     latex: `a=${t.toFixed(2)}`,
   })
-  calculator.setExpression({
-    id: 'r',
-    latex: `r=${(currentScale * coneRadius).toFixed(2)}`,
-    hidden: true,
-  })
-  calculator.setExpression({
-    id: 'h',
-    latex: `h=${(currentScale * coneHeight).toFixed(2)}`,
-  })
+  if (
+    radioButtonsState === 'radiusRate' ||
+    radioButtonsState === 'heightRate'
+  ) {
+    calculator.setExpression({
+      id: 'Volume',
+      latex: '(t, \\frac{1}{3}\\pi (t\\cdot r)^2(t \\cdot h))',
+      parametricDomain: { min: '0', max: 'a' },
+      color: Desmos.Colors.PURPLE,
+      label: 'Volume',
+    })
+    calculator.setExpression({
+      id: 'Radius',
+      latex: '(t, t\\cdot r)',
+      parametricDomain: { min: '0', max: 'a' },
+      color: Desmos.Colors.BLUE,
+      label: 'Radius',
+    })
+    calculator.setExpression({
+      id: 'Height',
+      latex: '(t, t\\cdot h)',
+      parametricDomain: { min: '0', max: 'a' },
+      color: Desmos.Colors.RED,
+      label: 'Height',
+    })
+    calculator.setExpression({
+      id: 'r',
+      latex: `r=${radiusRate.toFixed(2)}`,
+      hidden: true,
+    })
+    calculator.setExpression({
+      id: 'h',
+      latex: `h=${heightRate.toFixed(2)}`,
+    })
+  }
+  if (radioButtonsState === 'volumeFlowRate') {
+    calculator.setExpression({
+      id: 'Volume',
+      latex: '(t, t\\cdot v)',
+      parametricDomain: { min: '0', max: 'a' },
+      color: Desmos.Colors.PURPLE,
+      label: 'Volume',
+    })
+    calculator.setExpression({
+      id: 'Radius',
+      latex:
+        '(t, \\sqrt{\\frac{\\left(3\\cdot v\\cdot t\\right)}{ \\pi\\cdot h}})',
+      parametricDomain: { min: '0', max: 'a' },
+      color: Desmos.Colors.BLUE,
+      label: 'Radius',
+    })
+    calculator.setExpression({
+      id: 'Height',
+      latex: '(t, \\frac{\\left(3\\cdot v\\cdot t\\right)}{\\pi\\cdot r^2})',
+      parametricDomain: { min: '0', max: 'a' },
+      color: Desmos.Colors.RED,
+      label: 'Height',
+    })
+    calculator.setExpression({
+      id: 'h',
+      latex: `h=${(currentScale * coneHeight).toFixed(2)}`,
+      hidden: true,
+    })
+    calculator.setExpression({
+      id: 'v',
+      latex: `v=${volumeRate.toFixed(2)}`,
+    })
+    calculator.setExpression({
+      id: 'r',
+      latex: `r=${currentScale * coneRadius.toFixed(2)}`,
+      hidden: true,
+    })
+  }
   calculator.setMathBounds({
-    left: -0.2 * maxScale,
-    right: t,
-    bottom: -0.5 * calculateYMax(),
-    top: calculateYMax(),
+    left: -0.2 * t,
+    right: t * 1.2,
+    bottom: -0.2 * calculateYMax(),
+    top: calculateYMax() * 1.2,
   })
 }
 
@@ -479,13 +525,13 @@ function animate() {
       }
       if (radioButtonsState === 'volumeFlowRate') {
         fixedVolume += volumeRate * scaleDirection
-        console.log(`fixedVolume: ${fixedVolume}`)
+        //console.log(`fixedVolume: ${fixedVolume}`)
         currHeight = Math.pow(
           (3 * fixedVolume) / (Math.PI * Math.pow(coneRadius / coneHeight, 2)),
           1 / 3
         )
-        console.log(`currHeight:${currHeight}`)
-        console.log(`currHeight/coneHeight:${currHeight / coneHeight}`)
+        //console.log(`currHeight:${currHeight}`)
+        //console.log(`currHeight/coneHeight:${currHeight / coneHeight}`)
         currentScale = scaleDirection * (currHeight / coneHeight)
         console.log(`currentScale:${currentScale}`)
         if (currentScale <= 0) currentScale = minScale
@@ -509,6 +555,7 @@ function animate() {
     // Update current frame based on slider value
     currentScale = animationSlider.value / 1000
     fixedVolume = (animationSlider.value / 1000) * calculateVolume()
+    t = 0
     startTime = undefined
 
     // Animate scaling of waterGroup (cone + edges)
@@ -534,5 +581,5 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix()
   renderer.setSize(window.innerWidth / 2, window.innerHeight / 5)
   elt.style.width = window.innerWidth / 2
-  elt.style.height = '400px'
+  elt.style.height = '600px'
 })

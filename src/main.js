@@ -83,7 +83,7 @@ let radiusRate = heightRate * (coneRadius / coneHeight)
 document.getElementById('radiusRateInput').value = radiusRate
 let fixedVolume = 0
 let volume = 0
-let prevHeight = 0
+let prevHeight = 0.1
 let currHeight = 0
 
 // Initial states
@@ -376,7 +376,6 @@ radioButtons.forEach((button) => {
       document.getElementById('radiusRateInput').value = radiusRate
     }
     radioButtonsState = this.value
-    console.log(this.value)
   })
 })
 
@@ -471,9 +470,19 @@ function animate() {
         currentScale += scaleDirection * (heightRate / coneHeight)
       }
       if (radioButtonsState === 'volumeFlowRate') {
-        fixedVolume += volumeRate
-        console.log(`volume rate: ${volumeRate}`)
+        fixedVolume += volumeRate * scaleDirection
+        console.log(`fixedVolume: ${fixedVolume}`)
+        currHeight = Math.pow(
+          (3 * fixedVolume) / (Math.PI * (coneRadius / coneHeight)),
+          1 / 3
+        )
+        if (currHeight === 0) currHeight = 0.01
+        if (prevHeight === 0) prevHeight = 0.01
+        console.log(`currHeight:${currHeight}`)
+        //console.log(`prevHeight:${prevHeight}`)
+        console.log(`curr/cone:${currHeight / coneHeight}`)
         currentScale += scaleDirection * (volumeRate / 10)
+        prevHeight = currHeight
       }
     }
 

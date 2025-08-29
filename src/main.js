@@ -5,14 +5,33 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 //Desmos setup
 const elt = document.getElementById('desmos-graph')
 elt.style.width = window.innerWidth / 2
-elt.style.height = '600px'
+elt.style.height = '400px'
 
 const calculator = Desmos.GraphingCalculator(elt, {
   keypad: false,
-  expressionsCollapsed: false,
+  expressionsCollapsed: true,
   settingsMenu: false,
-  zoomButtons: false,
-  expressions: true,
+})
+calculator.setExpression({
+  id: 'Volume',
+  latex: '(t, \\frac{1}{3}\\pi (t\\cdot r)^2(t \\cdot h))',
+  parametricDomain: { min: '0', max: 'a' },
+  color: Desmos.Colors.PURPLE,
+  label: 'Volume',
+})
+calculator.setExpression({
+  id: 'Radius',
+  latex: '(t, t\\cdot r)',
+  parametricDomain: { min: '0', max: 'a' },
+  color: Desmos.Colors.BLUE,
+  label: 'Radius',
+})
+calculator.setExpression({
+  id: 'Height',
+  latex: '(t, t\\cdot h)',
+  parametricDomain: { min: '0', max: 'a' },
+  color: Desmos.Colors.RED,
+  label: 'Height',
 })
 
 document.body.append(elt)
@@ -39,7 +58,8 @@ const renderer = new THREE.WebGLRenderer({
 const canvas = document.getElementById('threejs-canvas')
 
 // Set new dimensions
-renderer.setSize(window.innerWidth / 2, window.innerHeight / 5)
+canvas.width = window.innerWidth
+canvas.height = window.innerHeight
 
 // Load water video
 const video = document.createElement('video')
@@ -49,42 +69,15 @@ video.src = 'water2.mp4'
 video.playbackRate = 0.5
 video.play()
 
-// Initial container cone parameters
+// Initial cone parameters
 let coneHeight = parseFloat(document.getElementById('heightInput').value)
 let coneRadius = parseFloat(document.getElementById('radiusInput').value)
-let coneSegments = 32
+let coneSegments = 64
 let thresholdAngle = 30
 
-// Initial liquid cone conditions
-let volumeRate = parseFloat(document.getElementById('volumeRateInput').value)
-let heightRate = parseFloat(document.getElementById('heightRateInput').value)
-let radiusRate = heightRate * (coneRadius / coneHeight)
-document.getElementById('radiusRateInput').value = radiusRate
-let fixedVolume = 0
-let volume = 0
-let prevHeight = 0.1
-let currHeight = 0
-
-// Initial states
-document.getElementById('radiusRate').checked = true
-document.getElementById('radiusRateInput').disabled = false
-document.getElementById('volumeRateInput').disabled = true
-document.getElementById('heightRateInput').disabled = true
-let radioButtonsState = 'radiusRate'
-
-// Set max values for rate inputs
-function setRateMaxes() {
-  document.getElementById('volumeRateInput').max = (
-    (1 / 3) *
-    Math.PI *
-    coneRadius *
-    coneRadius *
-    coneHeight
-  ).toFixed(2)
-  document.getElementById('heightRateInput').max = coneHeight.toFixed(2)
-  document.getElementById('radiusRateInput').max = coneRadius.toFixed(2)
-}
-setRateMaxes()
+// Rates values
+let prevRadius, prevHeight, prevVolume, currHeight, currVolume, currRadius
+let radiusRate, heightRate, volumeRate
 
 // ---------------- Container Cone (static) ----------------
 const containerGeometry = new THREE.ConeGeometry(
@@ -175,92 +168,24 @@ function updateDesmos() {
   calculator.removeExpression({ id: 'a' })
   calculator.removeExpression({ id: 'r' })
   calculator.removeExpression({ id: 'h' })
-  calculator.removeExpression({ id: 'Volume' })
-  calculator.removeExpression({ id: 'Radius' })
-  calculator.removeExpression({ id: 'Height' })
   calculator.setExpression({
     id: 'a',
-    latex: `a=${t.toFixed(2)}`,
+    latex: `a=${currentScale.toFixed(2)}`,
   })
-  if (
-    radioButtonsState === 'radiusRate' ||
-    radioButtonsState === 'heightRate'
-  ) {
-    calculator.setExpression({
-      id: 'Volume',
-      latex: '(t, \\frac{1}{3}\\pi (t\\cdot r)^2(t \\cdot h))',
-      parametricDomain: { min: '0', max: 'a' },
-      color: Desmos.Colors.PURPLE,
-      label: 'Volume',
-    })
-    calculator.setExpression({
-      id: 'Radius',
-      latex: '(t, t\\cdot r)',
-      parametricDomain: { min: '0', max: 'a' },
-      color: Desmos.Colors.BLUE,
-      label: 'Radius',
-    })
-    calculator.setExpression({
-      id: 'Height',
-      latex: '(t, t\\cdot h)',
-      parametricDomain: { min: '0', max: 'a' },
-      color: Desmos.Colors.RED,
-      label: 'Height',
-    })
-    calculator.setExpression({
-      id: 'r',
-      latex: `r=${radiusRate.toFixed(2)}`,
-      hidden: true,
-    })
-    calculator.setExpression({
-      id: 'h',
-      latex: `h=${heightRate.toFixed(2)}`,
-    })
-  }
-  if (radioButtonsState === 'volumeFlowRate') {
-    calculator.setExpression({
-      id: 'Volume',
-      latex: '(t, t\\cdot v)',
-      parametricDomain: { min: '0', max: 'a' },
-      color: Desmos.Colors.PURPLE,
-      label: 'Volume',
-    })
-    calculator.setExpression({
-      id: 'Radius',
-      latex:
-        '(t, \\sqrt{\\frac{\\left(3\\cdot v\\cdot t\\right)}{ \\pi\\cdot h\\cdot t}})',
-      parametricDomain: { min: '0', max: 'a' },
-      color: Desmos.Colors.BLUE,
-      label: 'Radius',
-    })
-    calculator.setExpression({
-      id: 'Height',
-      latex:
-        '(t, \\frac{\\left(3\\cdot v\\cdot t\\right)}{\\pi\\cdot \\left(r\\cdot t\\right)^2})',
-      parametricDomain: { min: '0', max: 'a' },
-      color: Desmos.Colors.RED,
-      label: 'Height',
-    })
-    calculator.setExpression({
-      id: 'h',
-      latex: `h=${(currentScale * coneHeight).toFixed(2)}`,
-      hidden: true,
-    })
-    calculator.setExpression({
-      id: 'v',
-      latex: `v=${volumeRate.toFixed(2)}`,
-    })
-    calculator.setExpression({
-      id: 'r',
-      latex: `r=${(currentScale * coneRadius).toFixed(2)}`,
-      hidden: true,
-    })
-  }
+  calculator.setExpression({
+    id: 'r',
+    latex: `r=${(currentScale * coneRadius).toFixed(2)}`,
+    hidden: true,
+  })
+  calculator.setExpression({
+    id: 'h',
+    latex: `h=${(currentScale * coneHeight).toFixed(2)}`,
+  })
   calculator.setMathBounds({
-    left: -0.2 * t,
-    right: t * 1.2,
-    bottom: -0.2 * calculateYMax(),
-    top: calculateYMax() * 1.2,
+    left: -0.5 * maxScale,
+    right: maxScale * 1.5,
+    bottom: -0.5 * calculateYMax(),
+    top: calculateYMax() + calculateYMax() / 2,
   })
 }
 
@@ -310,6 +235,13 @@ function updateValueBars() {
   }px`
 }
 
+// ---------------- Update Rate Value Bars ----------------
+function updateRateValueBars() {
+  volumeRateBar.style.width = `${Math.min(Math.abs(volumeRate * 1000), 200)}px`
+  radiusRateBar.style.width = `${Math.min(Math.abs(radiusRate * 1000), 200)}px`
+  heightRateBar.style.width = `${Math.min(Math.abs(heightRate * 1000), 200)}px`
+}
+
 // ---------------- Math Formulas --------------
 function calculateVolume() {
   return (
@@ -346,12 +278,11 @@ function calculateBarsMax() {
   )
 }
 
-// ---------------- Calculate H from Fixed V ----------------
-function calculateHfromV() {
-  return Math.pow(
-    (3 * fixedVolume) / (Math.PI * (coneRadius / coneHeight)),
-    1 / 3
-  )
+// ---------------- Calculate Rates ----------------
+function calculateRates() {
+  volumeRate = currVolume - prevVolume
+  heightRate = currHeight - prevHeight
+  radiusRate = currRadius - prevRadius
 }
 
 // ---------------- Dimension Display --------------
@@ -360,102 +291,37 @@ const radiusDisplay = document.getElementById('radius-display')
 const heightDisplay = document.getElementById('height-display')
 
 function updateDisplays() {
-  volume = calculateVolume()
-  volumeDisplay.textContent = volume.toFixed(2)
-
+  volumeDisplay.textContent = calculateVolume().toFixed(2)
   radiusDisplay.textContent = calculateRadius().toFixed(2)
   heightDisplay.textContent = calculateHeight().toFixed(2)
 }
 
+// ---------------- Rates Display --------------
+const volumeRateDisplay = document.getElementById('volume-rate-display')
+const radiusRateDisplay = document.getElementById('radius-rate-display')
+const heightRateDisplay = document.getElementById('height-rate-display')
+
+function updateRateDisplays() {
+  volumeRateDisplay.textContent = (volumeRate * 1000).toFixed(2)
+  radiusRateDisplay.textContent = (radiusRate * 1000).toFixed(2)
+  heightRateDisplay.textContent = (heightRate * 1000).toFixed(2)
+}
+
 // ---------------- Input Listeners ----------------
-document.getElementById('volumeRateInput').addEventListener('input', (e) => {
-  volumeRate = parseFloat(e.target.value)
-  updateDisplays()
-  updateDesmos()
-})
-
-document.getElementById('heightRateInput').addEventListener('input', (e) => {
-  heightRate = parseFloat(e.target.value)
-  updateDisplays()
-  updateDesmos()
-
-  // Keep height and radius locked
-  radiusRate = heightRate * (coneRadius / coneHeight)
-  document.getElementById('radiusRateInput').value = radiusRate
-})
-
-document.getElementById('radiusRateInput').addEventListener('input', (e) => {
-  radiusRate = parseFloat(e.target.value)
-  updateDisplays()
-  updateDesmos()
-
-  // Keep height and radius locked
-  heightRate = radiusRate * (coneHeight / coneRadius)
-  document.getElementById('heightRateInput').value = heightRate
-})
-
-const radioButtons = document.querySelectorAll('input[name="rateType"]')
-radioButtons.forEach((button) => {
-  button.addEventListener('change', function () {
-    let vri = document.getElementById('volumeRateInput')
-    let rri = document.getElementById('radiusRateInput')
-    let hri = document.getElementById('heightRateInput')
-    if (this.value === 'volumeFlowRate') {
-      isFlowFixed = true
-      vri.disabled = false
-      rri.disabled = true
-      hri.disabled = true
-    }
-    if (this.value === 'radiusRate') {
-      isFlowFixed = false
-      vri.disabled = true
-      rri.disabled = false
-      hri.disabled = true
-      heightRate = radiusRate * (coneHeight / coneRadius)
-      document.getElementById('heightRateInput').value = heightRate
-    }
-    if (this.value === 'heightRate') {
-      isFlowFixed = false
-      vri.disabled = true
-      rri.disabled = true
-      hri.disabled = false
-      radiusRate = heightRate * (coneRadius / coneHeight)
-      document.getElementById('radiusRateInput').value = radiusRate
-    }
-    radioButtonsState = this.value
-  })
-})
-
 document.getElementById('heightInput').addEventListener('input', (e) => {
   coneHeight = parseFloat(e.target.value)
-  if (radioButtonsState === 'heightRate') {
-    radiusRate = heightRate * (coneRadius / coneHeight)
-    document.getElementById('radiusRateInput').value = radiusRate
-  }
-  if (radioButtonsState === 'radiusRate') {
-    heightRate = radiusRate * (coneHeight / coneRadius)
-    document.getElementById('heightRateInput').value = heightRate
-  }
   updateCones()
   updateDisplays()
+  updateRateDisplays()
   updateDesmos()
-  setRateMaxes()
 })
 
 document.getElementById('radiusInput').addEventListener('input', (e) => {
   coneRadius = parseFloat(e.target.value)
-  if (radioButtonsState === 'heightRate') {
-    radiusRate = heightRate * (coneRadius / coneHeight)
-    document.getElementById('radiusRateInput').value = radiusRate
-  }
-  if (radioButtonsState === 'radiusRate') {
-    heightRate = radiusRate * (coneHeight / coneRadius)
-    document.getElementById('heightRateInput').value = heightRate
-  }
   updateCones()
   updateDisplays()
+  updateRateDisplays()
   updateDesmos()
-  setRateMaxes()
 })
 
 const playPauseButton = document.getElementById('play-pause-button')
@@ -478,96 +344,71 @@ const radiusBar = document.getElementById('radius-bar')
 const heightBar = document.getElementById('height-bar')
 const barLength = 200
 
-// ---------------- Animation for Fixed Radius/Height Scale ----------------
-let t = 0
-let elapsed = 0
-let startTime
+// ---------------- Rate Value Bars ----------------
+const volumeRateBar = document.getElementById('volume-rate-bar')
+const radiusRateBar = document.getElementById('radius-rate-bar')
+const heightRateBar = document.getElementById('height-rate-bar')
+
+// ---------------- Animation ----------------
 let isPlaying = true
 let scaleDirection = 1
 const minScale = 0.01
-const maxScale = 1.001
+const maxScale = 1.01
 let currentScale = 0.01
-
-// ---------------- Animation for Fixed Volume Flow Rate ----------------
-let isFlowFixed = false
-let maxVScale = calculateVolume()
+let currentFrame = 0
 
 function animate() {
   requestAnimationFrame(animate)
 
   if (isPlaying) {
-    // Create a 1 second counter
-
-    // Set the start time on the first frame
-    if (startTime === undefined) {
-      startTime = Date.now()
-    }
-    // Calculate time elapsed in milliseconds
-    elapsed = Date.now() - startTime
-    if (elapsed > 1000) {
-      t += 1 * scaleDirection
-      if (t < 0) t = 0
-      console.log(`Seconds elapsed: ${t}`)
-      elapsed = 0
-      startTime = undefined
-      if (radioButtonsState === 'radiusRate') {
-        currentScale += scaleDirection * (radiusRate / coneRadius)
-        if (currentScale <= 0) currentScale = minScale
-        if (currentScale > maxScale) currentScale = maxScale
-        if (currentScale >= maxScale || currentScale <= minScale)
-          scaleDirection *= -1
-      }
-      if (radioButtonsState === 'heightRate') {
-        currentScale += scaleDirection * (heightRate / coneHeight)
-        if (currentScale <= 0) currentScale = minScale
-        if (currentScale > maxScale) currentScale = maxScale
-        if (currentScale >= maxScale || currentScale <= minScale)
-          scaleDirection *= -1
-      }
-      if (radioButtonsState === 'volumeFlowRate') {
-        fixedVolume += volumeRate * scaleDirection
-        //console.log(`fixedVolume: ${fixedVolume}`)
-        currHeight = Math.pow(
-          (3 * fixedVolume) / (Math.PI * Math.pow(coneRadius / coneHeight, 2)),
-          1 / 3
-        )
-        //console.log(`currHeight:${currHeight}`)
-        //console.log(`currHeight/coneHeight:${currHeight / coneHeight}`)
-        currentScale = scaleDirection * (currHeight / coneHeight)
-        console.log(`currentScale:${currentScale}`)
-        if (currentScale <= 0) currentScale = minScale
-        if (currentScale > maxScale) currentScale = maxScale
-        if (currHeight >= coneHeight || currHeight <= 0) scaleDirection *= 1
-      }
-    }
-
+    // Animate scaling of waterGroup (cone + edges)
+    currentScale += scaleDirection * 0.001
+    currHeight = calculateHeight()
+    currRadius = calculateRadius()
+    currVolume = calculateVolume()
     animationSlider.value = currentScale * 1000
+    if (currentScale > maxScale || currentScale < minScale) scaleDirection *= -1
     waterGroup.scale.set(currentScale, currentScale, currentScale)
 
-    // Keep water and container cone base aligned
+    // Keep base aligned
     waterGroup.position.y = (coneHeight * currentScale) / 2
 
+    calculateRates()
     updateValueBars()
+    updateRateValueBars()
     updateDisplays()
+    updateRateDisplays()
     updateDesmos()
+
+    prevHeight = currHeight
+    prevRadius = currRadius
+    prevVolume = currVolume
   }
 
   if (!isPlaying) {
     // Update current frame based on slider value
-    currentScale = animationSlider.value / 1000
-    fixedVolume = (animationSlider.value / 1000) * calculateVolume()
-    t = 0
-    startTime = undefined
+    currentFrame = animationSlider.value / 1000
+    currentScale = currentFrame
+    currHeight = calculateHeight()
+    currRadius = calculateRadius()
+    currVolume = calculateVolume()
 
     // Animate scaling of waterGroup (cone + edges)
-    waterGroup.scale.set(currentScale, currentScale, currentScale)
+    waterGroup.scale.set(currentFrame, currentFrame, currentFrame)
 
     // Keep base aligned
     waterGroup.position.y = (coneHeight * waterGroup.scale.y) / 2
 
+    calculateRates()
     updateValueBars()
+    updateRateValueBars()
     updateDisplays()
+    updateRateDisplays()
     updateDesmos()
+
+    prevHeight = currHeight
+    prevRadius = currRadius
+    prevVolume = currVolume
   }
 
   controls.update()
@@ -580,7 +421,7 @@ animate()
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight
   camera.updateProjectionMatrix()
-  renderer.setSize(window.innerWidth / 2, window.innerHeight / 5)
+  renderer.setSize(window.innerWidth, window.innerHeight)
   elt.style.width = window.innerWidth / 2
-  elt.style.height = '600px'
+  elt.style.height = '400px'
 })

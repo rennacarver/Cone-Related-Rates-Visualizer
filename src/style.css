@@ -37,6 +37,24 @@
   background-color: #b84d46;
 }
 
+#volume-rate-bar {
+  width: 0%;
+  height: 100%;
+  background-color: #8d7cbd;
+}
+
+#radius-rate-bar {
+  width: 0%;
+  height: 100%;
+  background-color: #7a9ac6;
+}
+
+#height-rate-bar {
+  width: 0%;
+  height: 100%;
+  background-color: #ce837e;
+}
+
 #info {
   font-size: larger;
 }
@@ -54,4 +72,11 @@ canvas {
 
 #desmos-graph {
   margin-top: 2rem;
+}
+
+#display,
+#ratesDisplay {
+  display: inline-block;
+  border: 2px solid grey;
+  border-radius: 3px;
 }

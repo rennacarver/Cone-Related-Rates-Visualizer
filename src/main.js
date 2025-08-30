@@ -6,6 +6,10 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 const themeToggle = document.getElementById('theme-toggle')
 const root = document.documentElement
 
+// Get references to formula elements
+const volumeFormula = document.getElementById('volume-formula')
+const volumeRateFormula = document.getElementById('volume-rate-formula')
+
 // SVGs
 const moonSVG = `
 <svg xmlns="http://www.w3.org/2000/svg"
@@ -48,28 +52,38 @@ themeToggle.innerHTML = moonSVG
 themeToggle.addEventListener('click', () => {
   const svg = themeToggle.querySelector('svg')
 
-  // Rotate icon 360deg
-  svg.style.transform = 'rotate(360deg)'
-
-  // Reset rotation after transition ends
-  svg.addEventListener(
-    'transitionend',
-    () => {
-      svg.style.transform = ''
-    },
-    { once: true }
-  )
-
   // Switch theme and SVG
   if (root.getAttribute('data-theme') === 'light') {
     root.setAttribute('data-theme', 'dark')
     themeToggle.innerHTML = moonSVG
+    scene.background = new THREE.Color(0x1d1d1d)
+    calculator.updateSettings({ invertedColors: true })
+    volumeFormula.textContent = `$$ {\\color{#9bb458}{V}} = \\frac{1}{3} \\pi {\\color{#c0874b}{r}}^2 {\\color{#59afb5}{h}}$$`
+
+    volumeRateFormula.textContent = `$$ {\\color{#9bb458}{\\frac{dV}{dt}}} = \\frac{1}{3} \\pi \\Big(2 r h {\\color{#805b34}{\\frac{dr}{dt}}} +
+r^2 {\\color{#3c7478}{\\frac{dh}{dt}}}
+\\Big)
+$$`
   } else {
     root.setAttribute('data-theme', 'light')
     themeToggle.innerHTML = sunSVG
-  }
-})
+    scene.background = new THREE.Color(0xf4f4f4)
+    calculator.invertedColors = false
+    calculator.updateSettings({ invertedColors: false })
+    volumeFormula.textContent = `$$
+{\\color{#5b429f}{V}} = \\frac{1}{3} \\pi {\\color{#3e6eac}{r}}^2 {\\color{#b84d46}{h}}
+$$`
 
+    volumeRateFormula.textContent = `$$
+{\\color{#5b429f}{\\frac{dV}{dt}}} = \\frac{1}{3} \\pi \\Big(
+2 r h {\\color{#7a9ac6}{\\frac{dr}{dt}}} +
+r^2 {\\color{#ce837e}{\\frac{dh}{dt}}}
+\\Big)
+$$`
+  }
+  // Render MathJax after updating text
+  MathJax.typesetPromise([volumeFormula, volumeRateFormula])
+})
 // dark-light theme
 
 //Desmos setup
@@ -77,10 +91,12 @@ const elt = document.getElementById('desmos-graph')
 
 const calculator = Desmos.GraphingCalculator(elt, {
   keypad: false,
-  expressions: false,
-  settingsMenu: false,
+  expressions: true,
+  expressionsCollapsed: true,
+  settingsMenu: true,
   zoomButtons: false,
   border: false,
+  invertedColors: true,
 })
 calculator.setExpression({
   id: 'Volume',
@@ -108,7 +124,7 @@ resizeDesmos()
 
 // Scene setup
 const scene = new THREE.Scene()
-scene.background = new THREE.Color(0xf4f4f4)
+scene.background = new THREE.Color(0x1d1d1d)
 
 const camera = new THREE.PerspectiveCamera(
   75,
@@ -458,6 +474,22 @@ animationSlider.addEventListener('click', () => {
 window.addEventListener('resize', () => {
   setCanvasSize()
   resizeDesmos()
+})
+
+// ---------------- Collapsible Displays ----------------
+// Collapsible functionality with arrow
+document.querySelectorAll('.collapsible-header').forEach((header) => {
+  header.addEventListener('click', () => {
+    const content = header.nextElementSibling
+    const isCollapsed = content.classList.toggle('collapsed')
+
+    // Toggle arrow
+    if (!isCollapsed) {
+      header.classList.add('active') // open -> arrow up
+    } else {
+      header.classList.remove('active') // closed -> arrow down
+    }
+  })
 })
 
 // ---------------- Animation ----------------

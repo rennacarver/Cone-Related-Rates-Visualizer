@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/Cone-Related-Rates-Visualizer/favicon2024.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      id="MathJax-script"
+      async
+      src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"
+    ></script>
+    <title>Related Rates Visualizer</title>
+    <script type="module" crossorigin src="/Cone-Related-Rates-Visualizer/assets/index-DRg1RMjK.js"></script>
+    <link rel="stylesheet" crossorigin href="/Cone-Related-Rates-Visualizer/assets/index-DmeYZ4uQ.css">
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="info">Related Rates Visualizer</div>
+    <canvas id="threejs-canvas"></canvas>
+    <div id="controls">
+      <div id="slider-div">
+        <input
+          type="range"
+          id="animation-slider"
+          min="1"
+          max="1001"
+          value="0"
+        />
+        <button id="play-pause-button">⏸︎</button>
+      </div>
+
+      <div id="dimension-controls">
+        Height:
+        <input
+          type="number"
+          id="heightInput"
+          min="1"
+          max="10"
+          step="1"
+          value="2"
+        />
+        Radius:
+        <input
+          type="number"
+          id="radiusInput"
+          min="1"
+          max="10"
+          step="1"
+          value="1"
+        />
+      </div>
+    </div>
+
+    <div id="displays">
+      <div class="collapsible-container">
+        <h3 class="collapsible-header">Values</h3>
+        <div id="valuesDisplay" class="collapsible-content">
+          <div id="volume-formula">
+            $$ {\color{#9bb458}{V}} = \frac{1}{3} \pi {\color{#c0874b}{r}}^2
+            {\color{#59afb5}{h}}$$
+          </div>
+          <p>Volume \( V \): <span id="volume-display"></span></p>
+          <div id="bar-container"><div id="volume-bar"></div></div>
+          <p>Radius \( r \): <span id="radius-display"></span></p>
+          <div id="bar-container"><div id="radius-bar"></div></div>
+          <p>Height \( h \): <span id="height-display"></span></p>
+          <div id="bar-container"><div id="height-bar"></div></div>
+        </div>
+      </div>
+
+      <div class="collapsible-container">
+        <h3 class="collapsible-header">Rates</h3>
+        <div id="ratesDisplay" class="collapsible-content">
+          <div id="volume-rate-formula">
+            $$ {\color{#9bb458}{\frac{dV}{dt}}} = \frac{1}{3} \pi \Big(2 r h
+            {\color{#805b34}{\frac{dr}{dt}}} + r^2
+            {\color{#3c7478}{\frac{dh}{dt}}} \Big) $$
+          </div>
+          <p>
+            Volume Rate \( \frac{dV}{dt} \):
+            <span id="volume-rate-display"></span>
+          </p>
+          <div id="bar-container"><div id="volume-rate-bar"></div></div>
+          <p>
+            Radius Rate \( \frac{dr}{dt} \):
+            <span id="radius-rate-display"></span>
+          </p>
+          <div id="bar-container"><div id="radius-rate-bar"></div></div>
+          <p>
+            Height Rate \( \frac{dh}{dt} \):
+            <span id="height-rate-display"></span>
+          </p>
+          <div id="bar-container"><div id="height-rate-bar"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="desmos-graph"></div>
+    <hr id="bottom-line" />
+    <div id="footer">
+      <div id="image-beta-div">
+        <a target="_blank" href="https://www.projectcarver.com">
+          <img src="/Cone-Related-Rates-Visualizer/logo.png" alt="project carver logo" />
+        </a>
+        <span id="beta">BETA</span>
+      </div>
+
+      <div id="theme-toggle">
+        <!-- default icon, will be updated by JS -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="feather feather-moon"
+        >
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </div>
+    </div>
+  </body>
+</html>

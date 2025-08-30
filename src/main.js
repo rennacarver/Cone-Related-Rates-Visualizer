@@ -4,13 +4,14 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 //Desmos setup
 const elt = document.getElementById('desmos-graph')
-elt.style.width = window.innerWidth / 2
+elt.style.width = window.innerWidth
 elt.style.height = '400px'
 
 const calculator = Desmos.GraphingCalculator(elt, {
   keypad: false,
-  expressionsCollapsed: true,
+  expressions: false,
   settingsMenu: false,
+  zoomButtons: false,
 })
 calculator.setExpression({
   id: 'Volume',
@@ -38,7 +39,7 @@ document.body.append(elt)
 
 // Scene setup
 const scene = new THREE.Scene()
-scene.background = new THREE.Color(0xffffff)
+scene.background = new THREE.Color(0xf4f4f4)
 
 const camera = new THREE.PerspectiveCamera(
   75,
@@ -55,11 +56,7 @@ const renderer = new THREE.WebGLRenderer({
 })
 
 // Set three.js Canvas size
-const canvas = document.getElementById('threejs-canvas')
-
-// Set new dimensions
-canvas.width = window.innerWidth
-canvas.height = window.innerHeight
+setCanvasSize()
 
 // Load water video
 const video = document.createElement('video')
@@ -163,6 +160,9 @@ controls.enableRotate = true
 controls.enableZoom = true
 controls.enablePan = true
 
+// Center camera on cone
+centerCameraOnCone()
+
 // ---------------- Update Desmos Function ----------------
 function updateDesmos() {
   calculator.removeExpression({ id: 'a' })
@@ -182,11 +182,33 @@ function updateDesmos() {
     latex: `h=${(currentScale * coneHeight).toFixed(2)}`,
   })
   calculator.setMathBounds({
-    left: -0.5 * maxScale,
-    right: maxScale * 1.5,
-    bottom: -0.5 * calculateYMax(),
-    top: calculateYMax() + calculateYMax() / 2,
+    left: -0.2 * maxScale,
+    right: maxScale * 1.2,
+    bottom: -0.2 * calculateYMax(),
+    top: calculateYMax() * 1.1,
   })
+}
+
+// ---------------- Keep camera centered----------------
+function centerCameraOnCone() {
+  const box = new THREE.Box3().setFromObject(containerGroup)
+  const center = new THREE.Vector3()
+  box.getCenter(center)
+
+  controls.target.copy(center) // OrbitControls will orbit around cone center
+  camera.lookAt(center)
+}
+
+// ---------------- Set Canvas Size ----------------
+function setCanvasSize() {
+  const size = Math.min(window.innerWidth, window.innerHeight) * 0.9
+
+  // Update camera aspect to 1 (since it's square)
+  camera.aspect = 1
+  camera.updateProjectionMatrix()
+
+  // Force renderer canvas to square
+  renderer.setSize(size, size)
 }
 
 // ---------------- Update Cones Function ----------------
@@ -278,6 +300,17 @@ function calculateBarsMax() {
   )
 }
 
+// ---------------- Value Bars ----------------
+const volumeBar = document.getElementById('volume-bar')
+const radiusBar = document.getElementById('radius-bar')
+const heightBar = document.getElementById('height-bar')
+const barLength = 200
+
+// ---------------- Rate Value Bars ----------------
+const volumeRateBar = document.getElementById('volume-rate-bar')
+const radiusRateBar = document.getElementById('radius-rate-bar')
+const heightRateBar = document.getElementById('height-rate-bar')
+
 // ---------------- Calculate Rates ----------------
 function calculateRates() {
   volumeRate = currVolume - prevVolume
@@ -314,6 +347,7 @@ document.getElementById('heightInput').addEventListener('input', (e) => {
   updateDisplays()
   updateRateDisplays()
   updateDesmos()
+  centerCameraOnCone()
 })
 
 document.getElementById('radiusInput').addEventListener('input', (e) => {
@@ -322,6 +356,7 @@ document.getElementById('radiusInput').addEventListener('input', (e) => {
   updateDisplays()
   updateRateDisplays()
   updateDesmos()
+  centerCameraOnCone()
 })
 
 const playPauseButton = document.getElementById('play-pause-button')
@@ -338,22 +373,20 @@ animationSlider.addEventListener('click', () => {
   updateDesmos()
 })
 
-// ---------------- Value Bars ----------------
-const volumeBar = document.getElementById('volume-bar')
-const radiusBar = document.getElementById('radius-bar')
-const heightBar = document.getElementById('height-bar')
-const barLength = 200
+// ---------------- Handle Window Resize ----------------
+window.addEventListener('resize', () => {
+  setCanvasSize()
 
-// ---------------- Rate Value Bars ----------------
-const volumeRateBar = document.getElementById('volume-rate-bar')
-const radiusRateBar = document.getElementById('radius-rate-bar')
-const heightRateBar = document.getElementById('height-rate-bar')
+  // Keep Desmos graph responsive
+  elt.style.width = `${window.innerWidth}px`
+  elt.style.height = '400px'
+})
 
 // ---------------- Animation ----------------
 let isPlaying = true
 let scaleDirection = 1
 const minScale = 0.01
-const maxScale = 1.01
+const maxScale = 1.0
 let currentScale = 0.01
 let currentFrame = 0
 
@@ -416,12 +449,3 @@ function animate() {
 }
 
 animate()
-
-// ---------------- Handle Window Resize ----------------
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight
-  camera.updateProjectionMatrix()
-  renderer.setSize(window.innerWidth, window.innerHeight)
-  elt.style.width = window.innerWidth / 2
-  elt.style.height = '400px'
-})

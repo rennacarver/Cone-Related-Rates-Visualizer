@@ -60,18 +60,15 @@
 }
 
 canvas {
-  margin-top: 2rem;
+  margin-top: 0.5rem;
   margin-left: auto;
   margin-right: auto;
   display: block;
+  border-radius: 5px;
 }
 
 #volume-formula {
   font-size: 2rem;
-}
-
-#desmos-graph {
-  margin-top: 2rem;
 }
 
 #display,

@@ -23,70 +23,84 @@
     <div id="info">Related Rates Visualizer</div>
     <canvas id="threejs-canvas"></canvas>
     <div id="controls">
-      <input type="range" id="animation-slider" min="1" max="1001" value="0" />
+      <div id="slider-div">
+        <input
+          type="range"
+          id="animation-slider"
+          min="1"
+          max="1001"
+          value="0"
+        />
+        <button id="play-pause-button">⏸︎</button>
+      </div>
 
-      <button id="play-pause-button">Pause</button>
-
-      Height \( h \):
-      <input
-        type="number"
-        id="heightInput"
-        min="1"
-        max="10"
-        step="1"
-        value="2"
-      />
-      Radius \( r \):
-      <input
-        type="number"
-        id="radiusInput"
-        min="1"
-        max="10"
-        step="1"
-        value="1"
-      />
-    </div>
-    <div id="display">
-      <div>
-        $$ {\color{#5b429f}{V}} = \frac{1}{3} \pi {\color{#3e6eac}{r}} ^2
-        \color{#b84d46}{h} $$
-      </div>
-      <p>Volume \( V \): <span id="volume-display"></span></p>
-      <div id="bar-container">
-        <div id="volume-bar"></div>
-      </div>
-      <p>Radius \( r \): <span id="radius-display"></span></p>
-      <div id="bar-container">
-        <div id="radius-bar"></div>
-      </div>
-      <p>Height \( h \): <span id="height-display"></span></p>
-      <div id="bar-container">
-        <div id="height-bar"></div>
+      <div id="dimension-controls">
+        Height:
+        <input
+          type="number"
+          id="heightInput"
+          min="1"
+          max="10"
+          step="1"
+          value="2"
+        />
+        Radius:
+        <input
+          type="number"
+          id="radiusInput"
+          min="1"
+          max="10"
+          step="1"
+          value="1"
+        />
       </div>
     </div>
-    <div id="ratesDisplay">
-      <div>
-        $$ {\color{#5b429f} \frac{dV}{dt}} = \frac{1}{3}\pi \Big( 2
-        {\color{#3e6eac}}r h {\color{#3e6eac} \frac{dr}{dt}} + r^2
-        {\color{#b84d46} \frac{dh}{dt}} \Big) $$
+    <div id="displays">
+      <div id="valuesDisplay">
+        <div>
+          $$ {\color{#5b429f}{V}} = \frac{1}{3} \pi {\color{#3e6eac}{r}} ^2
+          \color{#b84d46}{h} $$
+        </div>
+        <p>Volume \( V \): <span id="volume-display"></span></p>
+        <div id="bar-container">
+          <div id="volume-bar"></div>
+        </div>
+        <p>Radius \( r \): <span id="radius-display"></span></p>
+        <div id="bar-container">
+          <div id="radius-bar"></div>
+        </div>
+        <p>Height \( h \): <span id="height-display"></span></p>
+        <div id="bar-container">
+          <div id="height-bar"></div>
+        </div>
       </div>
-      <p>
-        Volume Rate \( \frac{dV}{dt} \): <span id="volume-rate-display"></span>
-      </p>
-      <div id="bar-container">
-        <div id="volume-rate-bar"></div>
-      </div>
-      <p>
-        Radius Rate \( \frac{dr}{dt} \): <span id="radius-rate-display"></span>
-      </p>
-      <div id="bar-container">
-        <div id="radius-rate-bar"></div>
-      </div>
-      <p>
-        Height Rate \( \frac{dh}{dt} \): <span id="height-rate-display"></span>
-      </p>
-      <div id="bar-container">
-        <div id="height-rate-bar"></div>
+      <div id="ratesDisplay">
+        <div>
+          $$ {\color{#5b429f} \frac{dV}{dt}} = \frac{1}{3}\pi \Big( 2
+          {\color{#3e6eac}}r h {\color{#3e6eac} \frac{dr}{dt}} + r^2
+          {\color{#b84d46} \frac{dh}{dt}} \Big) $$
+        </div>
+        <p>
+          Volume Rate \( \frac{dV}{dt} \):
+          <span id="volume-rate-display"></span>
+        </p>
+        <div id="bar-container">
+          <div id="volume-rate-bar"></div>
+        </div>
+        <p>
+          Radius Rate \( \frac{dr}{dt} \):
+          <span id="radius-rate-display"></span>
+        </p>
+        <div id="bar-container">
+          <div id="radius-rate-bar"></div>
+        </div>
+        <p>
+          Height Rate \( \frac{dh}{dt} \):
+          <span id="height-rate-display"></span>
+        </p>
+        <div id="bar-container">
+          <div id="height-rate-bar"></div>
+        </div>
       </div>
     </div>
     <script type="module" src="/src/main.js"></script>

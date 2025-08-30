@@ -443,14 +443,14 @@ document.getElementById('radiusInput').addEventListener('input', (e) => {
 const playPauseButton = document.getElementById('play-pause-button')
 playPauseButton.addEventListener('click', () => {
   isPlaying = !isPlaying
-  playPauseButton.textContent = isPlaying ? 'Pause' : 'Play'
+  playPauseButton.textContent = isPlaying ? '⏸︎' : '▶'
 })
 
 const animationSlider = document.getElementById('animation-slider')
 
 animationSlider.addEventListener('click', () => {
   isPlaying = false
-  playPauseButton.textContent = isPlaying ? 'Pause' : 'Play'
+  playPauseButton.textContent = isPlaying ? '⏸︎' : '▶'
   updateDesmos()
 })
 

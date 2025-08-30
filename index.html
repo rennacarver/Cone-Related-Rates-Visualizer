@@ -48,27 +48,27 @@
     </div>
     <div id="display">
       <div>
-        $$ \color{#5b429f}{V} \color{black }= \frac{1}{3} \pi \color{#3e6eac}{r}
-        \color{black}^2 \color{#b84d46}{h} $$
+        $$ {\color{#5b429f}{V}} = \frac{1}{3} \pi {\color{#3e6eac}{r}} ^2
+        \color{#b84d46}{h} $$
       </div>
-      <p>Volume: <span id="volume-display"></span></p>
+      <p>Volume \( V \): <span id="volume-display"></span></p>
       <div id="bar-container">
         <div id="volume-bar"></div>
       </div>
-      <p>Radius: <span id="radius-display"></span></p>
+      <p>Radius \( r \): <span id="radius-display"></span></p>
       <div id="bar-container">
         <div id="radius-bar"></div>
       </div>
-      <p>Height: <span id="height-display"></span></p>
+      <p>Height \( h \): <span id="height-display"></span></p>
       <div id="bar-container">
         <div id="height-bar"></div>
       </div>
     </div>
     <div id="ratesDisplay">
       <div>
-        $$ \color{#5b429f} \frac{dV}{dt} \color{black}
-        =\frac{1}{3}\pi\left(2rh\color{#3e6eac}\frac{dr}{dt}\color{black
-        }+r^2\color{#b84d46} \frac{dh}{dt} \color{black} \right) $$
+        $$ {\color{#5b429f} \frac{dV}{dt}} = \frac{1}{3}\pi \Big( 2
+        {\color{#3e6eac}}r h {\color{#3e6eac} \frac{dr}{dt}} + r^2
+        {\color{#b84d46} \frac{dh}{dt}} \Big) $$
       </div>
       <p>
         Volume Rate \( \frac{dV}{dt} \): <span id="volume-rate-display"></span>
@@ -100,7 +100,23 @@
         <span id="beta">BETA</span>
       </div>
 
-      <button id="theme-toggle">Light Mode</button>
+      <div id="theme-toggle">
+        <!-- default icon, will be updated by JS -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="feather feather-moon"
+        >
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </div>
     </div>
   </body>
 </html>

@@ -4,18 +4,73 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 //dark-light theme
 const themeToggle = document.getElementById('theme-toggle')
+const root = document.documentElement
 
+// SVGs
+const moonSVG = `
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="24" height="24"
+     viewBox="0 0 24 24"
+     fill="currentColor"
+     stroke="currentColor"
+     stroke-width="2"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     class="feather feather-moon">
+  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+</svg>`
+
+const sunSVG = `
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="24" height="24"
+     viewBox="0 0 24 24"
+     fill="currentColor"
+     stroke="currentColor"
+     stroke-width="2"
+     stroke-linecap="round"
+     stroke-linejoin="round">
+  <circle cx="12" cy="12" r="5" />
+  <line x1="12" y1="1" x2="12" y2="3" />
+  <line x1="12" y1="21" x2="12" y2="23" />
+  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+  <line x1="1" y1="12" x2="3" y2="12" />
+  <line x1="21" y1="12" x2="23" y2="12" />
+  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+</svg>`
+
+// Initialize theme
+root.setAttribute('data-theme', 'dark')
+themeToggle.innerHTML = moonSVG
+
+// Toggle on click
 themeToggle.addEventListener('click', () => {
-  const root = document.documentElement
+  const svg = themeToggle.querySelector('svg')
 
+  // Rotate icon 360deg
+  svg.style.transform = 'rotate(360deg)'
+
+  // Reset rotation after transition ends
+  svg.addEventListener(
+    'transitionend',
+    () => {
+      svg.style.transform = ''
+    },
+    { once: true }
+  )
+
+  // Switch theme and SVG
   if (root.getAttribute('data-theme') === 'light') {
     root.setAttribute('data-theme', 'dark')
-    themeToggle.textContent = 'Light Mode'
+    themeToggle.innerHTML = moonSVG
   } else {
     root.setAttribute('data-theme', 'light')
-    themeToggle.textContent = 'Dark Mode'
+    themeToggle.innerHTML = sunSVG
   }
 })
+
+// dark-light theme
 
 //Desmos setup
 const elt = document.getElementById('desmos-graph')
@@ -25,6 +80,7 @@ const calculator = Desmos.GraphingCalculator(elt, {
   expressions: false,
   settingsMenu: false,
   zoomButtons: false,
+  border: false,
 })
 calculator.setExpression({
   id: 'Volume',
@@ -233,6 +289,7 @@ function resizeDesmos() {
   const desmosElt = document.getElementById('desmos-graph')
   desmosElt.style.width = `${size}px`
   desmosElt.style.height = `${size}px` // height = width → square
+  calculator.resize()
 }
 
 // ---------------- Update Cones Function ----------------

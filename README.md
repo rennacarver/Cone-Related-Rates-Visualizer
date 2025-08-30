@@ -1,5 +1,10 @@
 # Related Rates Visualizer (Cones)
 
+[LIVE DEMO](https://rennacarver.github.io/Cone-Related-Rates-Visualizer/)
+
+![animation](https://github.com/user-attachments/assets/f7dcbe6d-090f-435b-a5c6-e2cffc60128c)
+
+
 ## Features
 
 - Get comfortable with how formulas connect variables

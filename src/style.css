@@ -44,12 +44,14 @@ canvas,
 #desmos-graph {
   display: block;
   margin: 0.5rem auto;
-  width: 90%;
+  width: 100%;
+  max-width: 700px; /* constrain width */
   aspect-ratio: 1 / 1; /* square */
   border-radius: 10px;
   background-color: transparent;
   border: 1px #f2f2f2 solid;
   padding: 3px;
+  box-sizing: border-box; /* include padding in width */
 }
 
 /* ---------------- Inputs & Buttons ---------------- */
@@ -130,7 +132,17 @@ button {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 1rem;
+  max-width: 700px; /* prevent it from overflowing */
+  margin: 0 auto; /* center horizontally */
+  flex-wrap: wrap; /* allow wrapping on small screens */
+  box-sizing: border-box;
+}
+
+#bottom-line {
+  max-width: 500px;
+  width: 100%;
+  margin-top: 2rem;
+  border: 0.01rem solid #ccc;
 }
 
 #footer img {
@@ -171,6 +183,7 @@ button {
   justify-content: center;
   align-items: center;
   margin: 1rem 0rem;
+  gap: 8px;
 }
 
 #image-beta-div {
@@ -179,15 +192,23 @@ button {
   align-items: center;
 }
 
+/* Collapsible headers */
 .collapsible-header {
-  text-align: center;
   cursor: pointer;
-  background-color: #eee;
-  padding: 0.25rem 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #f2f2f2; /* light mode default */
   border-radius: 4px;
   margin-bottom: 0.25rem;
+  display: flex;
+  justify-content: space-between; /* for arrow */
+  align-items: center;
   user-select: none;
-  transition: background-color 0.3s ease;
+}
+
+/* Dark mode collapsible headers */
+:root[data-theme='dark'] .collapsible-header {
+  background-color: #1a1a1a; /* darker than body background */
+  color: var(--text-color);
 }
 
 .collapsible-header:hover {

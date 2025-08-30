@@ -288,7 +288,7 @@ function centerCameraOnCone() {
 
 // ---------------- Set Canvas Size ----------------
 function setCanvasSize() {
-  const size = Math.min(window.innerWidth, window.innerHeight) * 0.9
+  const size = Math.min(window.innerWidth * 0.9, window.innerHeight * 0.9, 700)
 
   // Update camera aspect to 1 (since it's square)
   camera.aspect = 1
@@ -300,7 +300,7 @@ function setCanvasSize() {
 
 // ---------------- Set Desmos Size ----------------
 function resizeDesmos() {
-  const size = Math.min(window.innerWidth, window.innerHeight) * 0.9
+  const size = Math.min(window.innerWidth * 0.9, window.innerHeight * 0.9, 700)
 
   const desmosElt = document.getElementById('desmos-graph')
   desmosElt.style.width = `${size}px`

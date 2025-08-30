@@ -1,17 +1,49 @@
-/* :root {
+:root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
+  /* color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #242424; */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-} */
+}
+
+:root {
+  --bg-color: #242424; /* dark background */
+  --text-color: rgba(255, 255, 255, 0.87); /* light text */
+  --input-border: #ccc;
+}
+
+:root[data-theme='light'] {
+  --bg-color: #ffffff; /* light background */
+  --text-color: #000000; /* dark text */
+  --input-border: #888;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+input,
+button {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 
 #bar-container {
   width: 200px;
@@ -82,4 +114,36 @@ canvas {
 #desmos-graph {
   display: block;
   margin: 0 auto;
+}
+
+img {
+  height: auto;
+  width: calc(25px + 0.75vw);
+}
+
+#beta {
+  font-size: 0.5rem; /* adjust as needed */
+  font-weight: bold;
+  margin-left: 8px; /* optional spacing from logo */
+}
+
+#image-beta-div {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+#footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+}
+
+#theme-toggle {
+  padding: 0.15rem 0.15rem;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }

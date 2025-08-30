@@ -5,6 +5,12 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <link rel="stylesheet" href="src/style.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&display=swap"
+      rel="stylesheet"
+    />
     <script
       id="MathJax-script"
       async
@@ -13,7 +19,6 @@
     <title>Related Rates Visualizer</title>
   </head>
   <body>
-    <div id="desmos-graph"></div>
     <div id="app"></div>
     <div id="info">Related Rates Visualizer</div>
     <canvas id="threejs-canvas"></canvas>
@@ -84,8 +89,18 @@
         <div id="height-rate-bar"></div>
       </div>
     </div>
-
-    <div><hr /></div>
     <script type="module" src="/src/main.js"></script>
+    <div id="desmos-graph"></div>
+    <hr id="bottom-line" />
+    <div id="footer">
+      <div id="image-beta-div">
+        <a target="_blank" href="https://www.projectcarver.com">
+          <img src="public/logo.png" alt="project carver logo" />
+        </a>
+        <span id="beta">BETA</span>
+      </div>
+
+      <button id="theme-toggle">Light Mode</button>
+    </div>
   </body>
 </html>

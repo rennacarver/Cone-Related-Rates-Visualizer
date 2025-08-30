@@ -2,10 +2,23 @@ import * as THREE from 'three'
 import Desmos from 'desmos'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
+//dark-light theme
+const themeToggle = document.getElementById('theme-toggle')
+
+themeToggle.addEventListener('click', () => {
+  const root = document.documentElement
+
+  if (root.getAttribute('data-theme') === 'light') {
+    root.setAttribute('data-theme', 'dark')
+    themeToggle.textContent = 'Light Mode'
+  } else {
+    root.setAttribute('data-theme', 'light')
+    themeToggle.textContent = 'Dark Mode'
+  }
+})
+
 //Desmos setup
 const elt = document.getElementById('desmos-graph')
-elt.style.width = window.innerWidth
-elt.style.height = '400px'
 
 const calculator = Desmos.GraphingCalculator(elt, {
   keypad: false,
@@ -35,7 +48,6 @@ calculator.setExpression({
   label: 'Height',
 })
 
-document.body.append(elt)
 resizeDesmos()
 
 // Scene setup

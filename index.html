@@ -18,6 +18,10 @@
     <div id="info">Related Rates Visualizer</div>
     <canvas id="threejs-canvas"></canvas>
     <div id="controls">
+      <input type="range" id="animation-slider" min="1" max="1001" value="0" />
+
+      <button id="play-pause-button">Pause</button>
+
       Height \( h \):
       <input
         type="number"
@@ -36,8 +40,6 @@
         step="1"
         value="1"
       />
-      <button id="play-pause-button">Pause</button>
-      <input type="range" id="animation-slider" min="1" max="1001" value="0" />
     </div>
     <div id="display">
       <div>

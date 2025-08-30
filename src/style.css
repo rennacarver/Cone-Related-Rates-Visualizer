@@ -57,6 +57,7 @@
 
 #info {
   font-size: larger;
+  text-align: center;
 }
 
 canvas {
@@ -76,4 +77,9 @@ canvas {
   display: inline-block;
   border: 2px solid grey;
   border-radius: 3px;
+}
+
+#desmos-graph {
+  display: block;
+  margin: 0 auto;
 }

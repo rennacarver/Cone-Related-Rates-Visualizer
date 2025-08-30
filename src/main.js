@@ -36,6 +36,7 @@ calculator.setExpression({
 })
 
 document.body.append(elt)
+resizeDesmos()
 
 // Scene setup
 const scene = new THREE.Scene()
@@ -54,6 +55,8 @@ const renderer = new THREE.WebGLRenderer({
   canvas: document.getElementById('threejs-canvas'),
   antialias: true,
 })
+
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 // Set three.js Canvas size
 setCanvasSize()
@@ -209,6 +212,15 @@ function setCanvasSize() {
 
   // Force renderer canvas to square
   renderer.setSize(size, size)
+}
+
+// ---------------- Set Desmos Size ----------------
+function resizeDesmos() {
+  const size = Math.min(window.innerWidth, window.innerHeight) * 0.9
+
+  const desmosElt = document.getElementById('desmos-graph')
+  desmosElt.style.width = `${size}px`
+  desmosElt.style.height = `${size}px` // height = width → square
 }
 
 // ---------------- Update Cones Function ----------------
@@ -376,10 +388,7 @@ animationSlider.addEventListener('click', () => {
 // ---------------- Handle Window Resize ----------------
 window.addEventListener('resize', () => {
   setCanvasSize()
-
-  // Keep Desmos graph responsive
-  elt.style.width = `${window.innerWidth}px`
-  elt.style.height = '400px'
+  resizeDesmos()
 })
 
 // ---------------- Animation ----------------

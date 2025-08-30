@@ -133,15 +133,17 @@ button {
   justify-content: space-between;
   align-items: center;
   max-width: 700px; /* prevent it from overflowing */
-  margin: 0 auto; /* center horizontally */
+  margin: 1rem auto; /* center horizontally */
   flex-wrap: wrap; /* allow wrapping on small screens */
   box-sizing: border-box;
+  padding: 0 2rem;
 }
 
 #bottom-line {
   max-width: 500px;
   width: 100%;
   margin-top: 2rem;
+  margin-bottom: 2rem;
   border: 0.01rem solid #ccc;
 }
 

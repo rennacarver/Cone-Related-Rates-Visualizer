@@ -4,6 +4,9 @@
 
 ![animation](https://github.com/user-attachments/assets/f7dcbe6d-090f-435b-a5c6-e2cffc60128c)
 
+## Motivation
+
+A lot of students struggle to see all of the moving parts of a differential equation. This visualizer takes one very common related rates problem (the filling of a cone) and animates the graphs and scenario to help students intuitively understand how rates and values are interconnected. When one value changes, all the other values change. And the rates at which they change are connected through the differential equation (which can be derived using implicit differentiation).
 
 ## Features
 

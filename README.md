@@ -2,7 +2,7 @@
 
 [LIVE DEMO](https://rennacarver.github.io/Cone-Related-Rates-Visualizer/)
 
-![animation](https://github.com/user-attachments/assets/f7dcbe6d-090f-435b-a5c6-e2cffc60128c)
+![Presentation1](https://github.com/user-attachments/assets/d23f2c4f-792b-472a-a4d6-bedab591a24e)
 
 ## Motivation
 

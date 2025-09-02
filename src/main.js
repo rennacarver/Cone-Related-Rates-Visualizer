@@ -91,7 +91,7 @@ const elt = document.getElementById('desmos-graph')
 
 const calculator = Desmos.GraphingCalculator(elt, {
   keypad: false,
-  expressions: true,
+  expressions: false,
   expressionsCollapsed: true,
   settingsMenu: true,
   zoomButtons: false,

@@ -578,20 +578,46 @@ modeToggle.addEventListener('click', () => {
 })
 
 // Detect triple click on canvas
+function easterEgg() {
+  const newVideo = document.createElement('video')
+  newVideo.loop = true
+  newVideo.muted = true
+  newVideo.src = 'mac.m4v'
+  newVideo.playbackRate = 1
+  newVideo.play()
+
+  const newTexture = new THREE.VideoTexture(newVideo)
+  waterCone.material.map = newTexture
+  waterCone.material.needsUpdate = true
+  console.log('You found the easter egg!')
+}
+
 renderer.domElement.addEventListener('click', (e) => {
   if (e.detail === 3) {
-    const newVideo = document.createElement('video')
-    newVideo.loop = true
-    newVideo.muted = true
-    newVideo.src = 'mac.m4v'
-    newVideo.playbackRate = 1
-    newVideo.play()
-
-    const newTexture = new THREE.VideoTexture(newVideo)
-    waterCone.material.map = newTexture
-    waterCone.material.needsUpdate = true
-    console.log('You found the easter egg!')
+    easterEgg()
   }
+})
+
+//Detect triple tap on mobile
+// --- Mobile: triple tap ---
+let tapCount = 0
+let tapTimer = null
+
+renderer.domElement.addEventListener('touchstart', () => {
+  tapCount++
+
+  if (tapCount === 3) {
+    easterEgg()
+    tapCount = 0
+    clearTimeout(tapTimer)
+    return
+  }
+
+  // reset if no triple tap within 600ms
+  clearTimeout(tapTimer)
+  tapTimer = setTimeout(() => {
+    tapCount = 0
+  }, 600)
 })
 
 // ---------------- Sync Sliders -------

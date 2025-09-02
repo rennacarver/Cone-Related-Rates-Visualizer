@@ -577,6 +577,23 @@ modeToggle.addEventListener('click', () => {
   speedControl = 0.001
 })
 
+// Detect triple click on canvas
+renderer.domElement.addEventListener('click', (e) => {
+  if (e.detail === 3) {
+    const newVideo = document.createElement('video')
+    newVideo.loop = true
+    newVideo.muted = true
+    newVideo.src = 'mac.m4v'
+    newVideo.playbackRate = 1
+    newVideo.play()
+
+    const newTexture = new THREE.VideoTexture(newVideo)
+    waterCone.material.map = newTexture
+    waterCone.material.needsUpdate = true
+    console.log('You found the easter egg!')
+  }
+})
+
 // ---------------- Sync Sliders -------
 const graphSlider = document.getElementById('graph-animation-slider')
 

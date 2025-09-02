@@ -277,13 +277,7 @@ function updateDesmos() {
     })
     calculator.setExpression({
       id: 'v',
-      latex: `v=${(
-        (1 / 3) *
-        Math.PI *
-        coneRadius *
-        coneRadius *
-        coneHeight
-      ).toFixed(2)}`,
+      latex: `v=${calculateVolumeMax().toFixed(2)}`,
     })
   } else {
     calculator.setExpression({
@@ -429,6 +423,10 @@ function calculateVolume() {
   )
 }
 
+function calculateVolumeMax() {
+  return (1 / 3) * Math.PI * coneRadius * coneRadius * coneHeight
+}
+
 function calculateRadius() {
   return coneRadius * currentScale
 }
@@ -459,6 +457,9 @@ function heightFromVolume(volume) {
   const k = coneRadius / coneHeight // fixed ratio
   return Math.cbrt((3 * volume) / (Math.PI * k * k))
 }
+
+// ---------------- Speed Control ----------------------
+let speedControl = 0.001
 
 // ---------------- Value Bars ----------------
 const volumeBar = document.getElementById('volume-bar')
@@ -521,6 +522,10 @@ document.getElementById('radiusInput').addEventListener('input', (e) => {
 
 const playPauseButton = document.getElementById('play-pause-button')
 playPauseButton.addEventListener('click', () => {
+  if (!isPlaying) {
+    currentScale = 0
+    volumeScale = 0
+  }
   isPlaying = !isPlaying
   playPauseButton.textContent = isPlaying ? '⏸︎' : '▶'
   graphPlayPauseButton.textContent = isPlaying ? '⏸︎' : '▶'
@@ -528,9 +533,25 @@ playPauseButton.addEventListener('click', () => {
 
 const graphPlayPauseButton = document.getElementById('graph-play-pause-button')
 graphPlayPauseButton.addEventListener('click', () => {
+  if (!isPlaying) {
+    currentScale = 0
+    volumeScale = 0
+  }
   isPlaying = !isPlaying
   graphPlayPauseButton.textContent = isPlaying ? '⏸︎' : '▶'
   playPauseButton.textContent = isPlaying ? '⏸︎' : '▶'
+})
+
+const forwardButtonOne = document.getElementById('forward-button-one')
+forwardButtonOne.addEventListener('click', () => {
+  speedControl += 0.001
+  if (speedControl > 0.01) speedControl = 0.001
+})
+
+const forwardButtonTwo = document.getElementById('forward-button-two')
+forwardButtonTwo.addEventListener('click', () => {
+  speedControl += 0.001
+  if (speedControl > 0.01) speedControl = 0.001
 })
 
 const animationSlider = document.getElementById('animation-slider')
@@ -545,14 +566,18 @@ animationSlider.addEventListener('click', () => {
 
 modeToggle.addEventListener('click', () => {
   currentScale = 0
+  volumeScale = 0
   scaleDirection = 1
   constantVolumeMode = !constantVolumeMode
   modeToggle.textContent = constantVolumeMode
     ? 'Mode: Constant Volume'
     : 'Mode: Linear Scale'
+  animationSlider.value = 0
+  graphSlider.value = 0
+  speedControl = 0.001
 })
 
-// ---------------- Sync Sliders and Play Buttons -------
+// ---------------- Sync Sliders -------
 const graphSlider = document.getElementById('graph-animation-slider')
 
 // Sync updates from duplicate → main
@@ -601,13 +626,12 @@ function animate() {
   if (isPlaying) {
     // Animate scaling of waterGroup (cone + edges)
     if (constantVolumeMode) {
-      volume += scaleDirection * 0.003
-      volumeScale =
-        volume / ((Math.PI * coneRadius * coneRadius * coneHeight) / 3)
+      volume += scaleDirection * speedControl
+      volumeScale = volume / calculateVolumeMax()
       const h = heightFromVolume(volume)
       currentScale = h / coneHeight
     }
-    if (!constantVolumeMode) currentScale += scaleDirection * 0.001
+    if (!constantVolumeMode) currentScale += scaleDirection * speedControl
 
     //variables for calculating rates
     currHeight = calculateHeight()
@@ -616,7 +640,8 @@ function animate() {
 
     animationSlider.value = currentScale * 1000
     graphSlider.value = currentScale * 1000
-    if (currentScale > maxScale || currentScale < minScale) scaleDirection *= -1
+    if (currentScale > maxScale) scaleDirection = -1
+    if (currentScale < minScale) scaleDirection = 1
     waterGroup.scale.set(currentScale, currentScale, currentScale)
 
     // Keep base aligned
@@ -635,16 +660,15 @@ function animate() {
   }
 
   if (!isPlaying) {
-    // Update current frame based on slider value
-    currentFrame = animationSlider.value / 1000
-    currentScale = currentFrame
+    currentScale = animationSlider.value / 1000
+    volumeScale = calculateVolume() / calculateVolumeMax()
     volume = calculateVolume()
     currHeight = calculateHeight()
     currRadius = calculateRadius()
     currVolume = calculateVolume()
 
     // Animate scaling of waterGroup (cone + edges)
-    waterGroup.scale.set(currentFrame, currentFrame, currentFrame)
+    waterGroup.scale.set(currentScale, currentScale, currentScale)
 
     // Keep base aligned
     waterGroup.position.y = (coneHeight * waterGroup.scale.y) / 2

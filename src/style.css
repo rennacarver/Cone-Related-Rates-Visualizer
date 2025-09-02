@@ -43,7 +43,7 @@ body {
 canvas,
 #desmos-graph {
   display: block;
-  margin: 0.5rem auto;
+  margin: 1rem auto;
   width: 100%;
   max-width: 700px; /* constrain width */
   aspect-ratio: 1 / 1; /* square */
@@ -237,4 +237,9 @@ button {
 
 .collapsible-header.active::after {
   content: '▲'; /* arrow when open */
+}
+
+#mode-toggle {
+  display: block;
+  margin: 1rem auto;
 }

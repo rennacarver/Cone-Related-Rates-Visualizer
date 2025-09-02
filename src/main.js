@@ -397,6 +397,21 @@ function calculateBarsMax() {
   )
 }
 
+// ---------------- Constant Volume Mode ------------------
+let constantVolumeMode = false
+const modeToggle = document.getElementById('mode-toggle')
+
+function coneVolume(r, h) {
+  return (Math.PI * r * r * h) / 3
+}
+
+function heightFromVolume(volume) {
+  const k = coneRadius / coneHeight // fixed ratio
+  return Math.cbrt((3 * volume) / (Math.PI * k * k))
+}
+
+const maxVolume = (Math.PI * coneRadius * coneRadius * coneHeight) / 3
+
 // ---------------- Value Bars ----------------
 const volumeBar = document.getElementById('volume-bar')
 const radiusBar = document.getElementById('radius-bar')
@@ -470,6 +485,13 @@ animationSlider.addEventListener('click', () => {
   updateDesmos()
 })
 
+modeToggle.addEventListener('click', () => {
+  constantVolumeMode = !constantVolumeMode
+  modeToggle.textContent = constantVolumeMode
+    ? 'Mode: Constant Volume'
+    : 'Mode: Linear Scale'
+})
+
 // ---------------- Handle Window Resize ----------------
 window.addEventListener('resize', () => {
   setCanvasSize()
@@ -499,16 +521,25 @@ const minScale = 0.01
 const maxScale = 1.0
 let currentScale = 0.01
 let currentFrame = 0
+let volume = 0
 
 function animate() {
   requestAnimationFrame(animate)
 
   if (isPlaying) {
     // Animate scaling of waterGroup (cone + edges)
-    currentScale += scaleDirection * 0.001
+    if (constantVolumeMode) {
+      volume += scaleDirection * 0.001
+      const h = heightFromVolume(volume)
+      currentScale = h / coneHeight
+    }
+    if (!constantVolumeMode) currentScale += scaleDirection * 0.001
+
+    //variables for calculating rates
     currHeight = calculateHeight()
     currRadius = calculateRadius()
     currVolume = calculateVolume()
+
     animationSlider.value = currentScale * 1000
     if (currentScale > maxScale || currentScale < minScale) scaleDirection *= -1
     waterGroup.scale.set(currentScale, currentScale, currentScale)
@@ -532,6 +563,7 @@ function animate() {
     // Update current frame based on slider value
     currentFrame = animationSlider.value / 1000
     currentScale = currentFrame
+    volume = calculateVolume()
     currHeight = calculateHeight()
     currRadius = calculateRadius()
     currVolume = calculateVolume()

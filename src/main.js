@@ -98,27 +98,6 @@ const calculator = Desmos.GraphingCalculator(elt, {
   border: false,
   invertedColors: true,
 })
-calculator.setExpression({
-  id: 'Volume',
-  latex: '(t, \\frac{1}{3}\\pi (t\\cdot r)^2(t \\cdot h))',
-  parametricDomain: { min: '0', max: 'a' },
-  color: Desmos.Colors.PURPLE,
-  label: 'Volume',
-})
-calculator.setExpression({
-  id: 'Radius',
-  latex: '(t, t\\cdot r)',
-  parametricDomain: { min: '0', max: 'a' },
-  color: Desmos.Colors.BLUE,
-  label: 'Radius',
-})
-calculator.setExpression({
-  id: 'Height',
-  latex: '(t, t\\cdot h)',
-  parametricDomain: { min: '0', max: 'a' },
-  color: Desmos.Colors.RED,
-  label: 'Height',
-})
 
 resizeDesmos()
 
@@ -255,24 +234,99 @@ function updateDesmos() {
   calculator.removeExpression({ id: 'a' })
   calculator.removeExpression({ id: 'r' })
   calculator.removeExpression({ id: 'h' })
-  calculator.setExpression({
-    id: 'a',
-    latex: `a=${currentScale.toFixed(2)}`,
-  })
-  calculator.setExpression({
-    id: 'r',
-    latex: `r=${(currentScale * coneRadius).toFixed(2)}`,
-    hidden: true,
-  })
-  calculator.setExpression({
-    id: 'h',
-    latex: `h=${(currentScale * coneHeight).toFixed(2)}`,
-  })
+  calculator.removeExpression({ id: 'v' })
+  calculator.removeExpression({ id: 'Volume' })
+  calculator.removeExpression({ id: 'Radius' })
+  calculator.removeExpression({ id: 'Height' })
+  if (constantVolumeMode) {
+    calculator.setExpression({
+      id: 'Volume',
+      latex: '(t, v \\cdot t)',
+      parametricDomain: { min: '0', max: 'a' },
+      color: Desmos.Colors.PURPLE,
+      label: 'Volume',
+    })
+    calculator.setExpression({
+      id: 'Radius',
+      latex:
+        '(t, \\left(\\frac{3\\cdot v\\cdot t}{\\pi\\cdot\\frac{h}{r}}\\right)^{\\frac{1}{3}})',
+      parametricDomain: { min: '0', max: 'a' },
+      color: Desmos.Colors.BLUE,
+      label: 'Radius',
+    })
+    calculator.setExpression({
+      id: 'Height',
+      latex:
+        '(t, \\left(\\frac{3\\cdot v\\cdot t}{\\pi\\cdot\\frac{r}{h}\\cdot\\frac{r}{h}}\\right)^{\\frac{1}{3}})',
+      parametricDomain: { min: '0', max: 'a' },
+      color: Desmos.Colors.RED,
+      label: 'Height',
+    })
+    calculator.setExpression({
+      id: 'a',
+      latex: `a=${volumeScale.toFixed(2)}`,
+    })
+    calculator.setExpression({
+      id: 'r',
+      latex: `r=${coneRadius.toFixed(2)}`,
+      hidden: true,
+    })
+    calculator.setExpression({
+      id: 'h',
+      latex: `h=${coneHeight.toFixed(2)}`,
+    })
+    calculator.setExpression({
+      id: 'v',
+      latex: `v=${(
+        (1 / 3) *
+        Math.PI *
+        coneRadius *
+        coneRadius *
+        coneHeight
+      ).toFixed(2)}`,
+    })
+  } else {
+    calculator.setExpression({
+      id: 'Volume',
+      latex: '(t, \\frac{1}{3}\\pi (t\\cdot r)^2(t \\cdot h))',
+      parametricDomain: { min: '0', max: 'a' },
+      color: Desmos.Colors.PURPLE,
+      label: 'Volume',
+    })
+    calculator.setExpression({
+      id: 'Radius',
+      latex: '(t, t\\cdot r)',
+      parametricDomain: { min: '0', max: 'a' },
+      color: Desmos.Colors.BLUE,
+      label: 'Radius',
+    })
+    calculator.setExpression({
+      id: 'Height',
+      latex: '(t, t\\cdot h)',
+      parametricDomain: { min: '0', max: 'a' },
+      color: Desmos.Colors.RED,
+      label: 'Height',
+    })
+    calculator.setExpression({
+      id: 'a',
+      latex: `a=${currentScale.toFixed(2)}`,
+    })
+    calculator.setExpression({
+      id: 'r',
+      latex: `r=${coneRadius.toFixed(2)}`,
+      hidden: true,
+    })
+    calculator.setExpression({
+      id: 'h',
+      latex: `h=${coneHeight.toFixed(2)}`,
+    })
+  }
+
   calculator.setMathBounds({
     left: -0.2 * maxScale,
     right: maxScale * 1.2,
     bottom: -0.2 * calculateYMax(),
-    top: calculateYMax() * 1.1,
+    top: Math.max(calculateYMax() * 1.5, 0.1),
   })
 }
 
@@ -401,16 +455,10 @@ function calculateBarsMax() {
 let constantVolumeMode = false
 const modeToggle = document.getElementById('mode-toggle')
 
-function coneVolume(r, h) {
-  return (Math.PI * r * r * h) / 3
-}
-
 function heightFromVolume(volume) {
   const k = coneRadius / coneHeight // fixed ratio
   return Math.cbrt((3 * volume) / (Math.PI * k * k))
 }
-
-const maxVolume = (Math.PI * coneRadius * coneRadius * coneHeight) / 3
 
 // ---------------- Value Bars ----------------
 const volumeBar = document.getElementById('volume-bar')
@@ -475,6 +523,14 @@ const playPauseButton = document.getElementById('play-pause-button')
 playPauseButton.addEventListener('click', () => {
   isPlaying = !isPlaying
   playPauseButton.textContent = isPlaying ? '⏸︎' : '▶'
+  graphPlayPauseButton.textContent = isPlaying ? '⏸︎' : '▶'
+})
+
+const graphPlayPauseButton = document.getElementById('graph-play-pause-button')
+graphPlayPauseButton.addEventListener('click', () => {
+  isPlaying = !isPlaying
+  graphPlayPauseButton.textContent = isPlaying ? '⏸︎' : '▶'
+  playPauseButton.textContent = isPlaying ? '⏸︎' : '▶'
 })
 
 const animationSlider = document.getElementById('animation-slider')
@@ -482,14 +538,29 @@ const animationSlider = document.getElementById('animation-slider')
 animationSlider.addEventListener('click', () => {
   isPlaying = false
   playPauseButton.textContent = isPlaying ? '⏸︎' : '▶'
+  graphPlayPauseButton.textContent = isPlaying ? '⏸︎' : '▶'
+  graphSlider.value = animationSlider.value
   updateDesmos()
 })
 
 modeToggle.addEventListener('click', () => {
+  currentScale = 0
+  scaleDirection = 1
   constantVolumeMode = !constantVolumeMode
   modeToggle.textContent = constantVolumeMode
     ? 'Mode: Constant Volume'
     : 'Mode: Linear Scale'
+})
+
+// ---------------- Sync Sliders and Play Buttons -------
+const graphSlider = document.getElementById('graph-animation-slider')
+
+// Sync updates from duplicate → main
+graphSlider.addEventListener('input', () => {
+  isPlaying = false
+  animationSlider.value = graphSlider.value
+  playPauseButton.textContent = isPlaying ? '⏸︎' : '▶'
+  graphPlayPauseButton.textContent = isPlaying ? '⏸︎' : '▶'
 })
 
 // ---------------- Handle Window Resize ----------------
@@ -522,6 +593,7 @@ const maxScale = 1.0
 let currentScale = 0.01
 let currentFrame = 0
 let volume = 0
+let volumeScale = 0
 
 function animate() {
   requestAnimationFrame(animate)
@@ -529,7 +601,9 @@ function animate() {
   if (isPlaying) {
     // Animate scaling of waterGroup (cone + edges)
     if (constantVolumeMode) {
-      volume += scaleDirection * 0.001
+      volume += scaleDirection * 0.003
+      volumeScale =
+        volume / ((Math.PI * coneRadius * coneRadius * coneHeight) / 3)
       const h = heightFromVolume(volume)
       currentScale = h / coneHeight
     }
@@ -541,6 +615,7 @@ function animate() {
     currVolume = calculateVolume()
 
     animationSlider.value = currentScale * 1000
+    graphSlider.value = currentScale * 1000
     if (currentScale > maxScale || currentScale < minScale) scaleDirection *= -1
     waterGroup.scale.set(currentScale, currentScale, currentScale)
 

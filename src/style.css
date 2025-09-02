@@ -173,7 +173,8 @@ button {
 }
 
 /* ---------------- Sliders & Controls ---------------- */
-#slider-div {
+#slider-div,
+#graph-slider-div {
   display: flex;
   justify-content: center;
   align-items: center;

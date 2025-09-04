@@ -34,4 +34,4 @@ A lot of students struggle to see all of the moving parts of a differential equa
 ## Fixes
 
 - The rates don't show when the animation is paused or the slider is manually moved
-- The animation slider can glitch when moved to 0
+- Leaving the height and radius fields blank causes the three.js canvas to fail

@@ -244,3 +244,28 @@ button {
   display: block;
   margin: 1rem auto;
 }
+
+@media screen and (min-width: 1000px) {
+  #app {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: nowrap;
+    max-width: 1700px;
+    margin: 0 auto;
+  }
+
+  #footer {
+    max-width: 1000px;
+  }
+
+  #bottom-line {
+    max-width: 1000px;
+  }
+  canvas,
+  #desmos-graph {
+    max-width: 500px;
+    max-height: 500px;
+  }
+}

@@ -19,103 +19,108 @@
     <title>Related Rates Visualizer</title>
   </head>
   <body>
-    <div id="app"></div>
     <div id="info">Related Rates Visualizer</div>
-    <canvas id="threejs-canvas"></canvas>
-    <div id="controls">
-      <div id="slider-div">
-        <input
-          type="range"
-          id="animation-slider"
-          min="1"
-          max="1001"
-          value="0"
-        />
-        <button id="play-pause-button">⏸︎</button>
-        <button id="forward-button-one">⏩</button>
-      </div>
-
-      <div id="dimension-controls">
-        Height:
-        <input
-          type="number"
-          id="heightInput"
-          min="1"
-          max="10"
-          step="1"
-          value="2"
-        />
-        Radius:
-        <input
-          type="number"
-          id="radiusInput"
-          min="1"
-          max="10"
-          step="1"
-          value="1"
-        />
-      </div>
-    </div>
-
-    <div id="displays">
-      <div class="collapsible-container">
-        <h3 class="collapsible-header">Values</h3>
-        <div id="valuesDisplay" class="collapsible-content">
-          <div id="volume-formula">
-            $$ {\color{#9bb458}{V}} = \frac{1}{3} \pi {\color{#c0874b}{r}}^2
-            {\color{#59afb5}{h}}$$
+    <div id="app">
+      <div id="canvas-and-controls">
+        <canvas id="threejs-canvas"></canvas>
+        <div id="controls">
+          <div id="slider-div">
+            <input
+              type="range"
+              id="animation-slider"
+              min="1"
+              max="1001"
+              value="0"
+            />
+            <button id="play-pause-button">⏸︎</button>
+            <button id="forward-button-one">⏩</button>
           </div>
-          <p>Volume \( V \): <span id="volume-display"></span></p>
-          <div id="bar-container"><div id="volume-bar"></div></div>
-          <p>Radius \( r \): <span id="radius-display"></span></p>
-          <div id="bar-container"><div id="radius-bar"></div></div>
-          <p>Height \( h \): <span id="height-display"></span></p>
-          <div id="bar-container"><div id="height-bar"></div></div>
+
+          <div id="dimension-controls">
+            Height:
+            <input
+              type="number"
+              id="heightInput"
+              min="1"
+              max="10"
+              step="1"
+              value="2"
+            />
+            Radius:
+            <input
+              type="number"
+              id="radiusInput"
+              min="1"
+              max="10"
+              step="1"
+              value="1"
+            />
+          </div>
         </div>
       </div>
 
-      <div class="collapsible-container">
-        <h3 class="collapsible-header">Rates</h3>
-        <div id="ratesDisplay" class="collapsible-content">
-          <div id="volume-rate-formula">
-            $$ {\color{#9bb458}{\frac{dV}{dt}}} = \frac{1}{3} \pi \Big(2 r h
-            {\color{#805b34}{\frac{dr}{dt}}} + r^2
-            {\color{#3c7478}{\frac{dh}{dt}}} \Big) $$
+      <div id="displays">
+        <div class="collapsible-container">
+          <h3 class="collapsible-header">Values</h3>
+          <div id="valuesDisplay" class="collapsible-content">
+            <div id="volume-formula">
+              $$ {\color{#9bb458}{V}} = \frac{1}{3} \pi {\color{#c0874b}{r}}^2
+              {\color{#59afb5}{h}}$$
+            </div>
+            <p>Volume \( V \): <span id="volume-display"></span></p>
+            <div id="bar-container"><div id="volume-bar"></div></div>
+            <p>Radius \( r \): <span id="radius-display"></span></p>
+            <div id="bar-container"><div id="radius-bar"></div></div>
+            <p>Height \( h \): <span id="height-display"></span></p>
+            <div id="bar-container"><div id="height-bar"></div></div>
           </div>
-          <p>
-            Volume Rate \( \frac{dV}{dt} \):
-            <span id="volume-rate-display"></span>
-          </p>
-          <div id="bar-container"><div id="volume-rate-bar"></div></div>
-          <p>
-            Radius Rate \( \frac{dr}{dt} \):
-            <span id="radius-rate-display"></span>
-          </p>
-          <div id="bar-container"><div id="radius-rate-bar"></div></div>
-          <p>
-            Height Rate \( \frac{dh}{dt} \):
-            <span id="height-rate-display"></span>
-          </p>
-          <div id="bar-container"><div id="height-rate-bar"></div></div>
+        </div>
+
+        <div class="collapsible-container">
+          <h3 class="collapsible-header">Rates</h3>
+          <div id="ratesDisplay" class="collapsible-content">
+            <div id="volume-rate-formula">
+              $$ {\color{#9bb458}{\frac{dV}{dt}}} = \frac{1}{3} \pi \Big(2 r h
+              {\color{#805b34}{\frac{dr}{dt}}} + r^2
+              {\color{#3c7478}{\frac{dh}{dt}}} \Big) $$
+            </div>
+            <p>
+              Volume Rate \( \frac{dV}{dt} \):
+              <span id="volume-rate-display"></span>
+            </p>
+            <div id="bar-container"><div id="volume-rate-bar"></div></div>
+            <p>
+              Radius Rate \( \frac{dr}{dt} \):
+              <span id="radius-rate-display"></span>
+            </p>
+            <div id="bar-container"><div id="radius-rate-bar"></div></div>
+            <p>
+              Height Rate \( \frac{dh}{dt} \):
+              <span id="height-rate-display"></span>
+            </p>
+            <div id="bar-container"><div id="height-rate-bar"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <script type="module" src="/src/main.js"></script>
+      <div id="graph-and-slider">
+        <div id="desmos-graph"></div>
+        <div id="graph-slider-div">
+          <input
+            type="range"
+            id="graph-animation-slider"
+            min="1"
+            max="1001"
+            value="0"
+          />
+          <button id="graph-play-pause-button">⏸︎</button>
+          <button id="forward-button-two">⏩</button>
+          <button id="mode-toggle">Mode: Linear Scale</button>
         </div>
       </div>
     </div>
 
-    <button id="mode-toggle">Mode: Linear Scale</button>
-
-    <script type="module" src="/src/main.js"></script>
-    <div id="desmos-graph"></div>
-    <div id="graph-slider-div">
-      <input
-        type="range"
-        id="graph-animation-slider"
-        min="1"
-        max="1001"
-        value="0"
-      />
-      <button id="graph-play-pause-button">⏸︎</button>
-      <button id="forward-button-two">⏩</button>
-    </div>
     <hr id="bottom-line" />
     <div id="footer">
       <div id="image-beta-div">

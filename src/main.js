@@ -55,6 +55,9 @@ function setThemeDark() {
 r^2 {\\color{#3c7478}{\\frac{dh}{dt}}}
 \\Big)
 $$`
+  themeToggle.innerHTML = moonSVG
+  // Render MathJax after updating text
+  MathJax.typesetPromise([volumeFormula, volumeRateFormula])
 }
 
 function setThemeLight() {
@@ -73,6 +76,9 @@ $$`
 r^2 {\\color{#ce837e}{\\frac{dh}{dt}}}
 \\Big)
 $$`
+  themeToggle.innerHTML = sunSVG
+  // Render MathJax after updating text
+  MathJax.typesetPromise([volumeFormula, volumeRateFormula])
 }
 
 // Toggle on click
@@ -88,7 +94,6 @@ themeToggle.addEventListener('click', () => {
   // Render MathJax after updating text
   MathJax.typesetPromise([volumeFormula, volumeRateFormula])
 })
-// dark-light theme
 
 //Desmos setup
 const elt = document.getElementById('desmos-graph')
@@ -332,10 +337,8 @@ function updateDesmos() {
 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
 if (prefersDark) {
   setThemeDark()
-  themeToggle.innerHTML = moonSVG
 } else {
   setThemeLight()
-  themeToggle.innerHTML = sunSVG
 }
 
 // ---------------- Keep camera centered----------------

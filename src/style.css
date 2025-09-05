@@ -74,40 +74,40 @@ button {
 #volume-bar {
   background-color: var(--volume-bar-color);
   height: 100%;
-  width: 0;
+  width: 0px;
 }
 #radius-bar {
   background-color: var(--radius-bar-color);
   height: 100%;
-  width: 0;
+  width: 0px;
 }
 #height-bar {
   background-color: var(--height-bar-color);
   height: 100%;
-  width: 0;
+  width: 0px;
 }
 
 #volume-rate-bar {
   background-color: var(--volume-rate-bar-color);
   height: 100%;
-  width: 0;
+  width: 0px;
 }
 #radius-rate-bar {
   background-color: var(--radius-rate-bar-color);
   height: 100%;
-  width: 0;
+  width: 0px;
 }
 #height-rate-bar {
   background-color: var(--height-rate-bar-color);
   height: 100%;
-  width: 0;
+  width: 0px;
 }
 
 /* ---------------- Info ---------------- */
 #info {
-  font-size: larger;
+  font-size: x-large;
   text-align: center;
-  margin: 0.5rem 0;
+  margin: 2rem 0 0.5rem 0;
 }
 
 /* ---------------- Displays ---------------- */

@@ -44,9 +44,36 @@ const sunSVG = `
   <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
 </svg>`
 
-// Initialize theme
-root.setAttribute('data-theme', 'dark')
-themeToggle.innerHTML = moonSVG
+function setThemeDark() {
+  root.setAttribute('data-theme', 'dark')
+  themeToggle.innerHTML = moonSVG
+  scene.background = new THREE.Color(0x1d1d1d)
+  calculator.updateSettings({ invertedColors: true })
+  volumeFormula.textContent = `$$ {\\color{#9bb458}{V}} = \\frac{1}{3} \\pi {\\color{#c0874b}{r}}^2 {\\color{#59afb5}{h}}$$`
+
+  volumeRateFormula.textContent = `$$ {\\color{#9bb458}{\\frac{dV}{dt}}} = \\frac{1}{3} \\pi \\Big(2 r h {\\color{#805b34}{\\frac{dr}{dt}}} +
+r^2 {\\color{#3c7478}{\\frac{dh}{dt}}}
+\\Big)
+$$`
+}
+
+function setThemeLight() {
+  root.setAttribute('data-theme', 'light')
+  themeToggle.innerHTML = sunSVG
+  scene.background = new THREE.Color(0xf4f4f4)
+  calculator.invertedColors = false
+  calculator.updateSettings({ invertedColors: false })
+  volumeFormula.textContent = `$$
+{\\color{#5b429f}{V}} = \\frac{1}{3} \\pi {\\color{#3e6eac}{r}}^2 {\\color{#b84d46}{h}}
+$$`
+
+  volumeRateFormula.textContent = `$$
+{\\color{#5b429f}{\\frac{dV}{dt}}} = \\frac{1}{3} \\pi \\Big(
+2 r h {\\color{#7a9ac6}{\\frac{dr}{dt}}} +
+r^2 {\\color{#ce837e}{\\frac{dh}{dt}}}
+\\Big)
+$$`
+}
 
 // Toggle on click
 themeToggle.addEventListener('click', () => {
@@ -54,32 +81,9 @@ themeToggle.addEventListener('click', () => {
 
   // Switch theme and SVG
   if (root.getAttribute('data-theme') === 'light') {
-    root.setAttribute('data-theme', 'dark')
-    themeToggle.innerHTML = moonSVG
-    scene.background = new THREE.Color(0x1d1d1d)
-    calculator.updateSettings({ invertedColors: true })
-    volumeFormula.textContent = `$$ {\\color{#9bb458}{V}} = \\frac{1}{3} \\pi {\\color{#c0874b}{r}}^2 {\\color{#59afb5}{h}}$$`
-
-    volumeRateFormula.textContent = `$$ {\\color{#9bb458}{\\frac{dV}{dt}}} = \\frac{1}{3} \\pi \\Big(2 r h {\\color{#805b34}{\\frac{dr}{dt}}} +
-r^2 {\\color{#3c7478}{\\frac{dh}{dt}}}
-\\Big)
-$$`
+    setThemeDark()
   } else {
-    root.setAttribute('data-theme', 'light')
-    themeToggle.innerHTML = sunSVG
-    scene.background = new THREE.Color(0xf4f4f4)
-    calculator.invertedColors = false
-    calculator.updateSettings({ invertedColors: false })
-    volumeFormula.textContent = `$$
-{\\color{#5b429f}{V}} = \\frac{1}{3} \\pi {\\color{#3e6eac}{r}}^2 {\\color{#b84d46}{h}}
-$$`
-
-    volumeRateFormula.textContent = `$$
-{\\color{#5b429f}{\\frac{dV}{dt}}} = \\frac{1}{3} \\pi \\Big(
-2 r h {\\color{#7a9ac6}{\\frac{dr}{dt}}} +
-r^2 {\\color{#ce837e}{\\frac{dh}{dt}}}
-\\Big)
-$$`
+    setThemeLight()
   }
   // Render MathJax after updating text
   MathJax.typesetPromise([volumeFormula, volumeRateFormula])
@@ -322,6 +326,16 @@ function updateDesmos() {
     bottom: -0.2 * calculateYMax(),
     top: Math.max(calculateYMax() * 1.5, 0.1),
   })
+}
+
+// Initialize theme
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+if (prefersDark) {
+  setThemeDark()
+  themeToggle.innerHTML = moonSVG
+} else {
+  setThemeLight()
+  themeToggle.innerHTML = sunSVG
 }
 
 // ---------------- Keep camera centered----------------

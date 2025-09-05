@@ -56,8 +56,6 @@ r^2 {\\color{#3c7478}{\\frac{dh}{dt}}}
 \\Big)
 $$`
   themeToggle.innerHTML = moonSVG
-  // Render MathJax after updating text
-  MathJax.typesetPromise([volumeFormula, volumeRateFormula])
 }
 
 function setThemeLight() {
@@ -77,8 +75,6 @@ r^2 {\\color{#ce837e}{\\frac{dh}{dt}}}
 \\Big)
 $$`
   themeToggle.innerHTML = sunSVG
-  // Render MathJax after updating text
-  MathJax.typesetPromise([volumeFormula, volumeRateFormula])
 }
 
 // Toggle on click
@@ -340,6 +336,8 @@ if (prefersDark) {
 } else {
   setThemeLight()
 }
+// Render MathJax after updating text
+MathJax.typesetPromise([volumeFormula, volumeRateFormula])
 
 // ---------------- Keep camera centered----------------
 function centerCameraOnCone() {
@@ -521,6 +519,7 @@ function updateRateDisplays() {
 // ---------------- Input Listeners ----------------
 document.getElementById('heightInput').addEventListener('input', (e) => {
   coneHeight = parseFloat(e.target.value)
+  console.log(coneHeight)
   updateCones()
   updateDisplays()
   updateRateDisplays()

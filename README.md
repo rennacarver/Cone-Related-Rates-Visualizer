@@ -31,5 +31,6 @@ A lot of students struggle to see all of the moving parts of a differential equa
 
 ## Fixes
 
-- The rates don't show when the animation is paused or the slider is manually moved
+- The rates don't show when the animation is paused
+- The graphs don't have a true "time" scale and instead are a simple scaling of the volume or radius/height from empty (0) to full (1)
 - Leaving the height and radius fields blank causes the three.js canvas to fail

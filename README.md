@@ -20,7 +20,7 @@ A lot of students struggle to see all of the moving parts of a differential equa
 - AI gets it wrong a lot but is a wonderful tool for learning a new framework, fixing small bugs, looking up documentation, and building small components
 - AI is not always great with architecture but is great for small details
 - Adding floating point numbers increases the complexity of the project and bugs 10x
-- Intrinsic design for CSS requires a lot less media queiries keeping the code clean and simple
+- Intrinsic design for CSS requires a lot less media queries keeping the code clean and simple
 
 ## Future Enhancements
 
